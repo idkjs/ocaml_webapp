@@ -1,0 +1,11 @@
+.org-tuareg-font-lock-module {
+    color: #7755cc;
+}
+
+.org-tuareg-font-lock-label {
+    color: #00aa99;
+}
+
+.org-tuareg-font-lock-constructor {
+    color: darkblue
+}

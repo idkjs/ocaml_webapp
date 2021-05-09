@@ -1,0 +1,40 @@
+#+TITLE: A Lightweight OCaml Webapp Tutorial
+
+* [[https://shonfeder.gitlab.io/ocaml_webapp/][Read the tutorial]]
+
+The tutorial walking through this codebase is hosted as a gitlab page at
+https://shonfeder.gitlab.io/ocaml_webapp/.
+
+* Overview
+
+This repository hosts the source code for a tutorial. It includes
+
+- Fully functioning code for a simple web application (in [[file:lib][./lib]] [[file:bin/][./bin]], along
+  with the toy database migrations in [[file:migrate/][./migrate]])
+- The published html for the tutorial served at
+  https://shonfeder.gitlab.io/ocaml_webapp/ (in [[file:public/][./public]])
+- The source code for the tutorial (in [[file:tutorial/][./tutorial]])
+
+* Download and build the app
+
+Assuming you have [[https://opam.ocaml.org/doc/Install.html][opam installed]] and configured:
+
+#+BEGIN_SRC sh
+git clone https://gitlab.com/shonfeder/ocaml_webapp.git
+cd ocaml_webapp
+opam switch create .
+#+END_SRC
+
+Then you can run the app with
+
+#+BEGIN_SRC sh
+ocalm_webapp
+#+END_SRC
+
+And navigate to http://localhost:3000/.
+
+* Contributions and improvements welcome!
+
+Issues and PRs, or any other feedback or updates are welcome.
+
+You can see the project notes in [[file:project.org][./project.org]] for pending todo items.

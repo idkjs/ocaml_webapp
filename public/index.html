@@ -1,0 +1,1954 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2020-10-31 Sat 19:37 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>A Lightweight OCaml Webapp Tutorial</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Shon Feder" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+<link rel="stylesheet" type="text/css" href="styles.css"/>
+<script type="text/javascript">
+// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
+<!--/*--><![CDATA[/*><!--*/
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
+     }
+    /*]]>*///-->
+// @license-end
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">A Lightweight OCaml Webapp Tutorial</h1>
+<div class="abstract" id="org69a2829">
+<p>
+This tutorial aims to guide readers familiar with OCaml along one course to a
+backend for a webapp. The app is lightweight in that it doesn&rsquo;t take much code
+to define and in that it probably shouldn&rsquo;t be used for any heavy, industrial
+applications.
+</p>
+
+<p>
+The app implements two kinds of functionality:
+</p>
+
+<ol class="org-ol">
+<li>An embellished echo server, responding to path parameters</li>
+<li>An interface to a rudimentary database of author excerpts</li>
+</ol>
+
+<p>
+The tutorial covers the following topics:
+</p>
+
+<ul class="org-ul">
+<li>Setting up and configuring the project</li>
+<li>Routing requests (including POSTed form data)</li>
+<li>Generating HTML dynamically</li>
+<li>Interfacing with PostgreSQL</li>
+</ul>
+
+<p>
+(The OCaml ecosystem also has great support for the frontend, thanks to
+<code>Js_of_ocaml</code> and <code>Bucklescript</code>, but we won&rsquo;t be covering that here.)
+</p>
+
+<p>
+Feedback, improvements, and corrections are <a href="#org9a3637f">most welcome</a>!
+</p>
+
+</div>
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org3cbcc08">1. Tips on Reading this Tutorial</a></li>
+<li><a href="#org01863d5">2. Clone This Repository </a></li>
+<li><a href="#orgdbbe46c">3. Setup</a>
+<ul>
+<li><a href="#org5f8ec55">3.1. Dependencies</a></li>
+<li><a href="#orga151e1a">3.2. Prerequisites</a></li>
+<li><a href="#orgcdf534f">3.3. Configuration</a></li>
+<li><a href="#org3159f25">3.4. Create an opam Switch </a></li>
+<li><a href="#orgd4c44ce">3.5. Create the Postgres database</a></li>
+</ul>
+</li>
+<li><a href="#org32e0679">4. Tour of the Application</a>
+<ul>
+<li><a href="#org82dc2af">4.1. The Executable</a></li>
+<li><a href="#org4666dd6">4.2. Simple Route Handlers</a></li>
+<li><a href="#org3246afc">4.3. Content Generation </a></li>
+<li><a href="#orgd923349">4.4. Interfacing with the Database </a></li>
+</ul>
+</li>
+<li><a href="#orgecb0815">5. Conclusion</a></li>
+<li><a href="#orgf617b3d">6. Corrections, Suggestions, and Feedback </a></li>
+<li><a href="#orgdd2d4ac">7. Additional Resources</a>
+<ul>
+<li><a href="#org724adaf">7.1. Documentation</a></li>
+<li><a href="#orgad72288">7.2. Tutorials</a></li>
+<li><a href="#org1664d02">7.3. Examples</a></li>
+<li><a href="#org481a846">7.4. About this tutorial</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org3cbcc08" class="outline-2">
+<h2 id="org3cbcc08"><span class="section-number-2">1</span> Tips on Reading this Tutorial</h2>
+<div class="outline-text-2" id="text-1">
+<ul class="org-ul">
+<li>This is a more &ldquo;advanced&rdquo; tutorial, covering a wide range of functionality.
+For a very basic intro using a simple echo server, see <a href="https://github.com/rgrinberg/opium">the README.md in the
+Opium repo</a>.</li>
+<li>All file paths are given relative to the project&rsquo;s root directory, unless explicitly
+noted otherwise.</li>
+<li>This repository contains the complete code for the app. The tutorial consists
+of a tour of the source code, with some notes on setup. So I encourage you to
+clone the app and play with the code as you read.</li>
+<li>For quick reference to code examples, see the <a href="#orge622355">Index of Listings</a></li>
+<li>Skip or skim &ldquo;Explanation of the code&rdquo; sections if the code is clear to you.</li>
+<li>Skip to the sections that are useful to you.</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org01863d5" class="outline-2">
+<h2 id="org01863d5"><span class="section-number-2">2</span> Clone This Repository <a id="orgf91755e"></a></h2>
+<div class="outline-text-2" id="text-2">
+<p>
+The best way to read this tutorial is to clone the repository
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh"><span class="org-type">git</span> clone https://gitlab.com/shonfeder/ocaml_webapp
+</pre>
+</div>
+
+<p>
+And play with the code as you read along.
+</p>
+
+<p>
+(If you&rsquo;re org-mode user, you may even prefer to just read the
+<a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/tutorial/tutorial.org">./tutorial/tutorial.org</a> file locally.)
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgdbbe46c" class="outline-2">
+<h2 id="orgdbbe46c"><span class="section-number-2">3</span> Setup</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org5f8ec55" class="outline-3">
+<h3 id="org5f8ec55"><span class="section-number-3">3.1</span> Dependencies</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+We will be using the following OCaml libraries to build the app:
+</p>
+
+<ul class="org-ul">
+<li><a href="https://github.com/rgrinberg/opium">Opium</a>: A Sinatra-like web toolkit</li>
+<li><a href="https://github.com/paurkedal/ocaml-caqti">Caqti</a>: A library for interfacing with PostgreSQL</li>
+<li><a href="https://github.com/roddyyaga/ppx_rapper">ppx_rapper</a>: A syntax extension to ease writing sql queries for <code>Caqti</code></li>
+<li><a href="https://ocsigen.org/tyxml/4.3.0/manual/intro">TyXML</a>: A library for generating correct HTML</li>
+<li><a href="https://erratique.ch/software/logs">Logs</a>: A logging library</li>
+<li><a href="https://github.com/ocsigen/lwt">Lwt</a>: A concurency library</li>
+<li><a href="https://ocaml.janestreet.com/ocaml-core/latest/doc/core/index.html">Core</a>: A (standard) standard library alternative</li>
+</ul>
+
+<p>
+There are many other excellent and powerful web libraries we won&rsquo;t be using. See
+<a href="https://ocamlverse.github.io/content/web_networking.html">the OCamlverse page on Web and Networking</a> for a catalog.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orga151e1a" class="outline-3">
+<h3 id="orga151e1a"><span class="section-number-3">3.2</span> Prerequisites</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+This section is for readers who don&rsquo;t currently have a well configured OCaml
+setup in place. Skip to <a href="#orgcdf534f">Configuration</a> if you&rsquo;re already setup with the modern
+suite of tools.
+</p>
+</div>
+
+<div id="outline-container-orga6840f8" class="outline-4">
+<h4 id="orga6840f8"><span class="section-number-4">3.2.1</span> Install and initialize <code>opam</code></h4>
+<div class="outline-text-4" id="text-3-2-1">
+<p>
+<code>opam</code> is the OCaml package manager.
+</p>
+
+<p>
+To install opam, run
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">sh &lt;<span class="org-rainbow-delimiters-depth-1">(</span><span class="org-type">curl</span> -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh<span class="org-rainbow-delimiters-depth-1">)</span>
+</pre>
+</div>
+
+<p>
+or <a href="https://opam.ocaml.org/doc/Install.html">choose another method.</a>
+</p>
+
+<p>
+Initialize opam and build your main working environment with
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">opam init
+<span class="org-comment-delimiter"># </span><span class="org-comment">Install any dependencies called for</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Answer yes to the prompts to configure your shell environment</span>
+
+opam switch 4.08.1
+<span class="org-comment-delimiter"># </span><span class="org-comment">Sets the system ocaml compiler to use ocaml 4.08.1</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Use a different version at your own discretion</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org2abd2c0" class="outline-4">
+<h4 id="org2abd2c0"><span class="section-number-4">3.2.2</span> Install dune</h4>
+<div class="outline-text-4" id="text-3-2-2">
+<p>
+<a href="https://github.com/ocaml/dune">Dune</a> is the standard build system for OCaml. We&rsquo;ll need it to initialize our
+project below.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">opam install dune
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org04b8e39" class="outline-4">
+<h4 id="org04b8e39"><span class="section-number-4">3.2.3</span> Install editor support and initialize your configurations</h4>
+<div class="outline-text-4" id="text-3-2-3">
+<p>
+For the basic tooling, run
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">opam install user-setup merlin ocamlformat ocp-indent
+opam user-setup install
+</pre>
+</div>
+</div>
+
+
+<ol class="org-ol">
+<li><a id="orgd3ec87d"></a>Emacs<br />
+<div class="outline-text-5" id="text-3-2-3-1">
+<p>
+Install the OCaml mode for emacs
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">opam install tuareg
+</pre>
+</div>
+
+<p>
+If you aren&rsquo;t already an emacs user but want to give it a spin, I highly
+recommend the <a href="https://www.spacemacs.org/">spacemacs</a> distribution for a beginner friendly approach.
+</p>
+
+<p>
+I use <a href="https://github.com/hlissner/doom-emacs">doom-emacs</a>, and find the IDE experience phenomenal.
+</p>
+</div>
+</li>
+
+<li><a id="orgd5dca10"></a>For Vim or VSCode<br />
+<div class="outline-text-5" id="text-3-2-3-2">
+<p>
+See <a href="https://ocamlverse.github.io/content/editor_setup.html">recommendations on the OCamlveres</a>.
+</p>
+</div>
+</li>
+</ol>
+</div>
+
+<div id="outline-container-org905bbb3" class="outline-4">
+<h4 id="org905bbb3"><span class="section-number-4">3.2.4</span> Install PostgreSQL <a id="orgc69d5c3"></a></h4>
+<div class="outline-text-4" id="text-3-2-4">
+<p>
+This tutorial currently<sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup>  uses postgres, and you&rsquo;ll need postgres installed to run
+the app successfully.
+</p>
+
+<p>
+If you don&rsquo;t already have postgres set up, see the <a href="https://www.postgresql.org/download/">installation instructions
+from postgresql.org</a> and/or the docs on installing postgres for your distro or
+OS.
+</p>
+
+<p>
+Make sure you also have configured your user with access to create and update
+databases. The Arch wiki has a short section <a href="https://wiki.archlinux.org/index.php/PostgreSQL#Create_your_first_database/user">on creating your first database and
+user</a>.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgcdf534f" class="outline-3">
+<h3 id="orgcdf534f"><span class="section-number-3">3.3</span> Configuration</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+This section is for users who aren&rsquo;t very familiar with configuring an OCaml
+project. Skip to <a href="#org145c485">Create an opam Switch</a> if you&rsquo;re familiar with wrangling <code>dune</code>
+and <code>opam</code>.
+</p>
+
+<p>
+We&rsquo;ll walk through the configuration<sup><a id="fnr.2" class="footref" href="#fn.2">2</a></sup> of the project in this
+section. However, if you cloned the repository, <a href="#orgf91755e">as advised</a>, I encourage you to
+skip to the <a href="#org145c485">next section</a> and then refer back here later as needed, and for
+reference when you&rsquo;re making your own project.
+</p>
+</div>
+
+<div id="outline-container-org5df3c13" class="outline-4">
+<h4 id="org5df3c13"><span class="section-number-4">3.3.1</span> Project initialization</h4>
+<div class="outline-text-4" id="text-3-3-1">
+<p>
+The basic skeleton was generated with the <a href="https://dune.readthedocs.io/en/stable/usage.html#initializing-components"><code>dune init</code> subcommand</a>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">dune init proj ocaml_webapp <span class="org-sh-escaped-newline">\</span>
+    --libs core,opium,caqti,caqti-driver-postgresql,caqti-lwt,tyxml,lwt.unix <span class="org-sh-escaped-newline">\</span>
+    --ppx ppx_rapper
+</pre>
+</div>
+
+<p>
+This creates a new directory named <code>ocaml_webapp</code>, with the following
+subdirectories corresponding to self-contained components:
+</p>
+
+<ul class="org-ul">
+<li><code>lib</code>: The library component, where all the business logic should live</li>
+<li><code>bin</code>: The executable component, this will be a client of our <code>lib</code></li>
+<li><code>test</code>: You can guess (we won&rsquo;t be using this in our tutorial)</li>
+</ul>
+
+<p>
+Each directory has it&rsquo;s own <code>dune</code> file configuring the component, (which
+includes a <code>libraries</code> stanza declaring the component&rsquo;s dependencies).
+</p>
+</div>
+</div>
+
+<div id="outline-container-orge52079a" class="outline-4">
+<h4 id="orge52079a"><span class="section-number-4">3.3.2</span> Configuration of the package and its dependencies</h4>
+<div class="outline-text-4" id="text-3-3-2">
+<p>
+We use <code>dune</code> to generate the <code>opam</code> package configuration. We always want to
+configure a package for our project so that dependencies are managed via
+configuration as code throughout.
+</p>
+
+<p>
+The package is configured in <code>./dune-project</code>:
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 1: </span>The project configuration in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/dune-project">./dune-project</a></label><pre class="src src-dune" id="org4875fb2">(lang dune <span class="org-highlight-numbers-number">2.0</span>)
+(generate_opam_files <span class="org-constant">true</span>)
+
+(<span class="org-function-name">name</span> ocaml_webapp)
+(version <span class="org-highlight-numbers-number">0.1</span>.<span class="org-highlight-numbers-number">0</span>)
+
+(authors <span class="org-string">"Shon Feder"</span>)
+(license MIT) <span class="org-comment">; </span><span class="org-bold"><span class="org-warning">TODO</span></span>
+(source (uri <span class="org-string">"git+https://gitlab.com/shonfeder/ocaml_webapp.git"</span>)) <span class="org-comment">; </span><span class="org-bold"><span class="org-warning">TODO</span></span>
+(maintainers <span class="org-string">"shon.feder@gmail.com"</span>) <span class="org-comment">; </span><span class="org-bold"><span class="org-warning">TODO</span></span>
+(homepage <span class="org-string">"https://gitlab.com/shonfeder/ocaml_webapp"</span>) <span class="org-comment">; </span><span class="org-bold"><span class="org-warning">TODO</span></span>
+(bug_reports <span class="org-string">"https://gitlab.com/shonfeder/ocaml_webapp/issues"</span>) <span class="org-comment">; </span><span class="org-bold"><span class="org-warning">TODO</span></span>
+(<span class="org-keyword">documentation</span> <span class="org-string">"https://shonfeder.gitlab.io/ocaml_webapp/"</span>) <span class="org-comment">; </span><span class="org-bold"><span class="org-warning">TODO</span></span>
+
+(<span class="org-function-name">package</span>
+ (<span class="org-function-name">name</span> ocaml_webapp)
+ (<span class="org-function-name">synopsis</span> <span class="org-string">"A minimal example of a lightweight webapp in OCaml"</span>) <span class="org-comment">; </span><span class="org-bold"><span class="org-warning">TODO</span></span>
+ (description <span class="org-string">"A minimal webapp using Opium, Catqi, and tyXML"</span>) <span class="org-comment">; </span><span class="org-bold"><span class="org-warning">TODO</span></span>
+ (depends
+  <span class="org-comment">;; General system dependencies</span>
+  (dune (&gt;= <span class="org-highlight-numbers-number">2</span>))
+  (ocaml (&gt;= <span class="org-highlight-numbers-number">4.08</span>.<span class="org-highlight-numbers-number">0</span>))
+
+  <span class="org-comment">;; Standard library replacement</span>
+  (core (&gt;= v0.<span class="org-highlight-numbers-number">12.2</span>))
+
+  <span class="org-comment">;; Web toolkit</span>
+  (opium (&gt;= <span class="org-highlight-numbers-number">0.17</span>.<span class="org-highlight-numbers-number">1</span>))
+
+  <span class="org-comment">;; Database interface</span>
+  (caqti (&gt;= <span class="org-highlight-numbers-number">1.2</span>.<span class="org-highlight-numbers-number">3</span>))
+  (caqti-lwt (&gt;= <span class="org-highlight-numbers-number">1.2</span>.<span class="org-highlight-numbers-number">0</span>))
+  (caqti-driver-postgresql (&gt;= <span class="org-highlight-numbers-number">1.2</span>.<span class="org-highlight-numbers-number">4</span>))
+  (ppx_rapper (&gt;= <span class="org-highlight-numbers-number">2.0</span>.<span class="org-highlight-numbers-number">0</span>))
+
+  <span class="org-comment">;; HTML generation</span>
+  (tyxml (&gt;= <span class="org-highlight-numbers-number">4.3</span>.<span class="org-highlight-numbers-number">0</span>))
+
+  <span class="org-comment">;; Logging</span>
+  (logs (&gt;= <span class="org-highlight-numbers-number">0.7</span>.<span class="org-highlight-numbers-number">0</span>))
+
+  <span class="org-comment">;; Dev dependencies</span>
+  (utop :dev)
+  (merlin :dev)
+  (ocamlformat :dev)
+  (ocp-indent :dev)
+  (tuareg :dev) <span class="org-comment">;; rm if not using emacs</span>
+))
+</pre>
+</div>
+
+<p>
+The fields that you should customize in your own app are marked with TODOs, and
+their meaning should be straightforward. See the <a href="https://dune.readthedocs.io/en/stable/opam.html#generating-opam-files">dune docs</a> if you want more
+details on this configuration.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orge9ccd9b" class="outline-4">
+<h4 id="orge9ccd9b"><span class="section-number-4">3.3.3</span> The <code>Makefile</code></h4>
+<div class="outline-text-4" id="text-3-3-3">
+<p>
+These <code>make</code> rules help to expedite and standardize some common development
+tasks and commands. (If you prefer to manage these manually, you can use the
+makefile as a recipe book.)
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 2: </span>Helper rules in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/Makefile">./Makefile</a></label><pre class="src src-makefile" id="org669372a"><span class="org-comment-delimiter"># </span><span class="org-comment">The name of your project (as given in the dune-project file)</span>
+<span class="org-comment-delimiter"># </span><span class="org-bold"><span class="org-warning">TODO</span></span>
+<span class="org-variable-name">project_name</span> = ocaml_webapp
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">The opam package configuration file</span>
+<span class="org-variable-name">opam_file</span> = $(<span class="org-variable-name">project_name</span>).opam
+
+<span class="org-makefile-targets">.PHONY</span>: deps run run-debug migrate rollback
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Alis to update the opam file and install the needed deps</span>
+<span class="org-makefile-targets">deps</span>: $(<span class="org-variable-name">opam_file</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Build and run the app</span>
+<span class="org-makefile-targets">run</span>:
+    dune exec $(<span class="org-variable-name">project_name</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Build and run the app with Opium's internal debug messages visible</span>
+<span class="org-makefile-targets">run-debug</span>:
+    dune exec $(<span class="org-variable-name">project_name</span>) -- --debug
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Run the database migrations defined in migrate/migrate.ml</span>
+<span class="org-makefile-targets">migrate</span>:
+    dune exec migrate_ocaml_webapp
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Run the database rollback defined in migrate/rollback.ml</span>
+<span class="org-makefile-targets">rollback</span>:
+    dune exec rollback_ocaml_webapp
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Update the package dependencies when new deps are added to dune-project</span>
+<span class="org-makefile-targets">$(</span><span class="org-variable-name"><span class="org-makefile-targets">opam_file</span></span><span class="org-makefile-targets">)</span>: dune-project
+    <span class="org-type">-</span><span class="org-makefile-shell">dune build @install        </span><span class="org-comment-delimiter"><span class="org-makefile-shell"># </span></span><span class="org-comment"><span class="org-makefile-shell">Update the $(</span></span><span class="org-comment"><span class="org-makefile-shell"><span class="org-variable-name">project_name</span></span></span><span class="org-comment"><span class="org-makefile-shell">).opam file</span></span>
+    <span class="org-type">-</span><span class="org-makefile-shell">git add $(</span><span class="org-makefile-shell"><span class="org-variable-name">opam_file</span></span><span class="org-makefile-shell">)       </span><span class="org-comment-delimiter"><span class="org-makefile-shell"># </span></span><span class="org-comment"><span class="org-makefile-shell">opam uses the state of master for it updates</span></span>
+    <span class="org-type">-</span><span class="org-makefile-shell">git commit $(</span><span class="org-makefile-shell"><span class="org-variable-name">opam_file</span></span><span class="org-makefile-shell">) -m </span><span class="org-string"><span class="org-makefile-shell">"Updating package dependencies"</span></span>
+    opam install . --deps-only  <span class="org-comment-delimiter"># </span><span class="org-comment">Install the new dependencies</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3159f25" class="outline-3">
+<h3 id="org3159f25"><span class="section-number-3">3.4</span> Create an opam Switch <a id="org145c485"></a></h3>
+<div class="outline-text-3" id="text-3-4">
+<p>
+An <code>opam</code> &ldquo;switch&rdquo; is a sandboxed ocaml environment.
+</p>
+</div>
+
+<div id="outline-container-org1318c84" class="outline-4">
+<h4 id="org1318c84"><span class="section-number-4">3.4.1</span> A fresh opam switch for the project</h4>
+<div class="outline-text-4" id="text-3-4-1">
+<p>
+Create a new <code>opam</code> switch for the project with:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh"><span class="org-comment-delimiter"># </span><span class="org-comment">From within the project root directory</span>
+opam switch create . 4.08.1 --deps-only
+<span class="org-comment-delimiter"># </span><span class="org-comment">I recommend 4.08.1 because all basic tools are compatible with it as of 2019/12/30</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">if this should need updating, please </span><span class="org-type"><span class="org-comment">make</span></span><span class="org-comment"> an issue or PR</span>
+</pre>
+</div>
+
+<p>
+Developing projects in their own switch helps to ensure smoother deployment and
+guards against dependency conflicts arising between unrelated projects on your
+local system.
+</p>
+
+<p>
+To verify that the switch has been created and that you are now working in the
+sandbox, you can run
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">opam switch
+<span class="org-comment-delimiter"># </span><span class="org-comment">&#8594;/home/you/path/to/ocaml_webapp  ocaml-base-compiler.4.08.1  /home/you/path/to/ocaml_webapp</span>
+</pre>
+</div>
+
+<p>
+If you do not see the switch associated with your project directory indicated by
+a <code>→</code>, then something has gone wrong.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgaf5366b" class="outline-4">
+<h4 id="orgaf5366b"><span class="section-number-4">3.4.2</span> Install dune in the switch</h4>
+<div class="outline-text-4" id="text-3-4-2">
+<p>
+We installed dune previously at the system level, but we&rsquo;ll need it in our
+project sandbox too:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">opam install dune
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org14d1660" class="outline-4">
+<h4 id="org14d1660"><span class="section-number-4">3.4.3</span> Install and update the project dependencies</h4>
+<div class="outline-text-4" id="text-3-4-3">
+<p>
+Run
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh"><span class="org-type">make</span> deps
+<span class="org-comment-delimiter"># </span><span class="org-comment">install all dependencies</span>
+</pre>
+</div>
+
+<p>
+(If you opted not to use the suggested <code>Makefile</code>, manually execute the <code>deps</code>
+rule defined in the <a href="#org669372a">Makefile</a>)
+</p>
+
+<p>
+<b>NOTE</b>: This assumes you are working inside a git repository If you did not
+clone this repo, then make sure to <code>git init</code> prior to installing the deps.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgfc6a194" class="outline-4">
+<h4 id="orgfc6a194"><span class="section-number-4">3.4.4</span> Confirm that the app skeleton can build</h4>
+<div class="outline-text-4" id="text-3-4-4">
+<div class="org-src-container">
+<pre class="src src-sh">dune build
+</pre>
+</div>
+
+<p>
+If no errors are reported, then setup is complete!
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd4c44ce" class="outline-3">
+<h3 id="orgd4c44ce"><span class="section-number-3">3.5</span> Create the Postgres database</h3>
+<div class="outline-text-3" id="text-3-5">
+<p>
+Assuming you have <a href="#orgc69d5c3">postgresql installed</a>, you can use the <code>createdb</code> utility to
+create a new database for the app:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">createdb ocaml_webapp
+<span class="org-comment-delimiter"># </span><span class="org-comment">Replace 'ocaml_webapp' with your app's name if you're working with custom code</span>
+</pre>
+</div>
+
+<p>
+Then run the database migration to create the needed tables
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh"><span class="org-type">make</span> migrate
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org4e6be5a" class="outline-4">
+<h4 id="org4e6be5a"><span class="section-number-4">3.5.1</span> Troubleshooting problems with the database port</h4>
+<div class="outline-text-4" id="text-3-5-1">
+<p>
+The app is configured to look for postgres at the localhost ip on its default
+port of <code>5432</code>. If you have trouble connecting, ensure that the database is
+configured to match this configuration, or update the configuration in
+<a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/db.ml">./lib/db.ml</a> to match your postgres setup:
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 3: </span>Databse port configuration in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/db.ml">./lib/db.ml</a></label><pre class="src src-ocaml" id="org460afe1"><span class="linenr">11: </span><span class="org-doc">(** Configuration of the connection *)</span>
+<span class="linenr">12: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">url</span> <span class="org-tuareg-font-lock-operator">=</span> <span class="org-string">"localhost"</span>
+<span class="linenr">13: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">port</span> <span class="org-tuareg-font-lock-operator">=</span> <span class="org-highlight-numbers-number">5432</span>
+<span class="linenr">14: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">database</span> <span class="org-tuareg-font-lock-operator">=</span> <span class="org-string">"ocaml_webapp"</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org32e0679" class="outline-2">
+<h2 id="org32e0679"><span class="section-number-2">4</span> Tour of the Application</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-org82dc2af" class="outline-3">
+<h3 id="org82dc2af"><span class="section-number-3">4.1</span> The Executable</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+We&rsquo;ll define our app&rsquo;s main executable entrypoint in the aptly named
+<code>./bin/main.ml</code>:
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 4: </span>The executable defined in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/bin/main.ml">./bin/main.ml</a></label><pre class="src src-ocaml" id="org703a6b9"><span class="linenr"> 1: </span><span class="org-tuareg-font-lock-governing">open </span><span class="org-tuareg-font-lock-module">Opium.Std</span>
+<span class="linenr"> 2: </span>
+<span class="linenr"> 3: </span><span class="org-tuareg-font-lock-governing">open </span><span class="org-tuareg-font-lock-module">Ocaml_webapp</span>
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">static</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr"> 6: </span>  <span class="org-tuareg-font-lock-module">Middleware.</span>static
+<span class="linenr"> 7: </span>    <span class="org-tuareg-font-lock-label">~local_path</span><span class="org-tuareg-font-lock-operator">:</span><span class="org-string">"./static"</span>
+<span class="linenr"> 8: </span>    <span class="org-tuareg-font-lock-label">~uri_prefix</span><span class="org-tuareg-font-lock-operator">:</span><span class="org-string">"/static"</span>
+<span class="linenr"> 9: </span>    <span class="org-tuareg-font-lock-operator">()</span>
+<span class="linenr">10: </span>
+<span class="linenr">11: </span><span class="org-doc">(** Build the Opium app  *)</span>
+<span class="linenr">12: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">app</span> <span class="org-tuareg-font-lock-operator">:</span> <span class="org-tuareg-font-lock-module">Opium.App.</span><span class="org-type">t </span><span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">13: </span>  <span class="org-tuareg-font-lock-module">App.</span>empty
+<span class="linenr">14: </span>  <span class="org-tuareg-font-lock-operator">|&gt;</span> <span class="org-tuareg-font-lock-module">App.</span>cmd_name <span class="org-string">"Ocaml Webapp Tutorial"</span>
+<span class="linenr">15: </span>  <span class="org-tuareg-font-lock-operator">|&gt;</span> middleware static
+<span class="linenr">16: </span>  <span class="org-tuareg-font-lock-operator">|&gt;</span> <span class="org-tuareg-font-lock-module">Db.</span>middleware
+<span class="linenr">17: </span>  <span class="org-tuareg-font-lock-operator">|&gt;</span> <span class="org-tuareg-font-lock-module">Route.</span>add_routes
+<span class="linenr">18: </span>
+<span class="linenr">19: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">log_level</span> <span class="org-tuareg-font-lock-operator">=</span> <span class="org-tuareg-font-lock-constructor">Some</span> <span class="org-tuareg-font-lock-module">Logs.</span><span class="org-tuareg-font-lock-constructor">Debug</span>
+<span class="linenr">20: </span>
+<span class="linenr">21: </span><span class="org-doc">(** Configure the logger *)</span>
+<span class="linenr">22: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">set_logger</span><span class="org-variable-name"> </span><span class="org-tuareg-font-lock-operator">()</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">23: </span>  <span class="org-tuareg-font-lock-module">Logs.</span>set_reporter <span class="org-tuareg-font-lock-operator">(</span><span class="org-tuareg-font-lock-module">Logs_fmt.</span>reporter <span class="org-tuareg-font-lock-operator">());</span>
+<span class="linenr">24: </span>  <span class="org-tuareg-font-lock-module">Logs.</span>set_level log_level
+<span class="linenr">25: </span>
+<span class="linenr">26: </span><span class="org-doc">(** Run the application *)</span>
+<span class="linenr">27: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-tuareg-font-lock-operator">()</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">28: </span>  set_logger <span class="org-tuareg-font-lock-operator">();</span>
+<span class="linenr">29: </span>  <span class="org-comment-delimiter">(* </span><span class="org-comment">run_command' generates a CLI that configures a deferred run of the app </span><span class="org-comment-delimiter">*)</span>
+<span class="linenr">30: </span>  <span class="org-keyword">match</span> <span class="org-tuareg-font-lock-module">App.</span>run_command' app <span class="org-keyword">with</span>
+<span class="linenr">31: </span>  <span class="org-comment-delimiter">(* </span><span class="org-comment">The deferred unit signals the deferred execution of the app </span><span class="org-comment-delimiter">*)</span>
+<span class="linenr">32: </span>  <span class="org-tuareg-font-lock-operator">|</span> <span class="org-tuareg-font-lock-constructor">`Ok</span> <span class="org-tuareg-font-lock-operator">(</span>app <span class="org-tuareg-font-lock-operator">:</span><span class="org-type"> unit </span><span class="org-tuareg-font-lock-module">Lwt.</span><span class="org-type">t </span><span class="org-tuareg-font-lock-operator">)</span> <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-module">Lwt_main.</span>run app
+<span class="linenr">33: </span>  <span class="org-tuareg-font-lock-operator">|</span> <span class="org-tuareg-font-lock-constructor">`Error</span>                  <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-builtin">exit</span> <span class="org-highlight-numbers-number">1</span>
+<span class="linenr">34: </span>  <span class="org-tuareg-font-lock-operator">|</span> <span class="org-tuareg-font-lock-constructor">`Not_running</span>            <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-builtin">exit</span> <span class="org-highlight-numbers-number">0</span>
+</pre>
+</div>
+
+<p>
+Run the app with
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh"><span class="org-type">make</span> run
+</pre>
+</div>
+
+<p>
+and visit <a href="http://localhost:3000/">http://localhost:3000/</a>.
+</p>
+</div>
+
+<div id="outline-container-orge4d8503" class="outline-4">
+<h4 id="orge4d8503"><span class="section-number-4">4.1.1</span> Explanation of the code</h4>
+<div class="outline-text-4" id="text-4-1-1">
+<p>
+From the bottom up&#x2026;
+</p>
+</div>
+
+<ol class="org-ol">
+<li><a id="orgb3c78cc"></a>Execution<br />
+<div class="outline-text-5" id="text-4-1-1-1">
+<p>
+The first thing we do is set up logging with the <code>set_logger</code>
+function<sup><a id="fnr.3" class="footref" href="#fn.3">3</a></sup>. Doing this first ensures that any important
+log messages that may be generated during subsequent actions will be recorded.
+</p>
+
+<p>
+<code>App.run_command' app</code> generates a commandline interface for launching our
+application <code>app</code>. It returns a value of type <code>unit Lwt.t</code>, signifying the
+<i>deferred</i> result of running the program.
+</p>
+
+<p>
+You can read the docs for the generated command line interface by running
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">dune exec ocaml_webapp -- --help
+</pre>
+</div>
+
+<p>
+We pass the deferred result to <code>Lwt_main.run</code>, which kicks of the <code>Lwt</code>
+scheduler, and runs our app (see <a href="https://ocsigen.org/lwt/4.1.0/api/Lwt_main">the Lwt_main docs</a> for more info).
+</p>
+</div>
+</li>
+
+<li><a id="org81484d3"></a>Setting the logger<br />
+<div class="outline-text-5" id="text-4-1-1-2">
+<p>
+The <code>set_logger</code> function itself merely uses the default <code>logs</code> log reporter. It
+sets the <code>log_level</code>, which we&rsquo;ve hard coded to <code>Logs.Debug</code>. We use the <code>Lwt</code>
+binding operator to sequence our actions here, just as we do in the <code>run</code>
+function.
+</p>
+
+<p>
+Note that for this logging configuration to work, we rely on the library
+dependencies <code>logs</code>, <code>logs.fmt</code>, and <code>logs.lwt</code> declared in
+<a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/bin/dune">./bin/dune</a>:
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 5: </span>Declaration of library dependencies from the <code>logs</code> package in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/bin/dune">./bin/dune</a></label><pre class="src src-dune"><span class="linenr"> 9: </span>   logs         <span class="org-comment">;; The logs library</span>
+<span class="linenr">10: </span>   logs.fmt     <span class="org-comment">;; The logs format helper</span>
+<span class="linenr">11: </span>   logs.lwt     <span class="org-comment">;; The logs concurrency helper</span>
+</pre>
+</div>
+
+<p>
+To see the debug logging output (very useful for tracking down routing problems)
+run the app with
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh"><span class="org-type">make</span> run-debug
+</pre>
+</div>
+
+<p>
+This will output all the incoming and outgoing HTTP requests to your terminal.
+</p>
+
+<p>
+<b>NOTE</b>: The <code>--debug</code> flag used in the invocation of Opium here only affects the
+<i>internal</i> logging from the Opium library. It is the <code>log_level</code> we set that
+effects the output level from the logger.
+</p>
+</div>
+</li>
+
+<li><a id="org3105b13"></a>Building the app<br />
+<div class="outline-text-5" id="text-4-1-1-3">
+<p>
+<code>let app = ...</code> defines our application. Applications are built up by pushing a
+base <code>App.empty</code> through a pipeline of functions of type <code>App.builder</code>.
+<code>App.builder</code> is just a synonym for functions of type <code>App.t -&gt; App.t</code>, which
+take in an application, add something to it, and pass along the new application.
+In this case, we build the app with the follow steps:
+</p>
+
+<ol class="org-ol">
+<li>Set the name for the command line interface with <code>App.cmd_name</code></li>
+<li>Add the middleware to serve static files</li>
+<li>Add the database connection to the environment with the <code>Db.middleware</code>
+function</li>
+<li>Add all of the route handlers with <code>Route.add_routes</code>.</li>
+</ol>
+
+<p>
+The helper <code>static</code> just configures a piece of middleware to serve static files,
+using Opium&rsquo;s <code>Middleware.static</code>. It serves the contents of the
+<a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/static">./static</a> directory at the <code>"/static"</code> route.
+</p>
+</div>
+</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org4666dd6" class="outline-3">
+<h3 id="org4666dd6"><span class="section-number-3">4.2</span> Simple Route Handlers</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+The <code>Route.add_routes</code> of <a href="#org703a6b9">./bin/main.ml</a> adds all of our route handlers to the
+app. This is defined in <code>./lib/route.ml</code>:
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 6: </span>The function to add our routes to the app in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/route.ml/">./lib/route.ml/</a></label><pre class="src src-ocaml" id="org4edb628"><span class="linenr">72: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">routes</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">73: </span>  <span class="org-tuareg-font-lock-operator">[</span> root
+<span class="linenr">74: </span>  <span class="org-tuareg-font-lock-operator">;</span> hello
+<span class="linenr">75: </span>  <span class="org-tuareg-font-lock-operator">;</span> hello_fallback
+<span class="linenr">76: </span>  <span class="org-tuareg-font-lock-operator">;</span> excerpts
+<span class="linenr">77: </span>  <span class="org-tuareg-font-lock-operator">;</span> get_excerpts_add
+<span class="linenr">78: </span>  <span class="org-tuareg-font-lock-operator">;</span> post_excerpts_add
+<span class="linenr">79: </span>  <span class="org-tuareg-font-lock-operator">;</span> excerpts_by_author
+<span class="linenr">80: </span>  <span class="org-tuareg-font-lock-operator">;</span> excerpts
+<span class="linenr">81: </span>  <span class="org-tuareg-font-lock-operator">]</span>
+<span class="linenr">82: </span>
+<span class="linenr">83: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">add_routes</span><span class="org-variable-name"> app</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">84: </span>  <span class="org-tuareg-font-lock-module">Core.List.</span>fold <span class="org-tuareg-font-lock-label">~f</span><span class="org-tuareg-font-lock-operator">:(</span><span class="org-keyword">fun</span> <span class="org-variable-name">app route</span> <span class="org-tuareg-font-lock-operator">-&gt;</span> route app<span class="org-tuareg-font-lock-operator">)</span> <span class="org-tuareg-font-lock-label">~init</span><span class="org-tuareg-font-lock-operator">:</span>app routes
+</pre>
+</div>
+
+<p>
+All of our routes are defined as <code>App.builder</code> functions, and listed in the
+<code>routes</code> list.
+</p>
+
+<p>
+Let&rsquo;s look at the simplest handlers, that just serve a basic page and act as an
+echo server:
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 7: </span>Simple handlers in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/route.ml">./lib/route.ml</a></label><pre class="src src-ocaml" id="orgecb5868"><span class="linenr"> 1: </span><span class="org-tuareg-font-lock-governing">open </span><span class="org-tuareg-font-lock-module">Opium.Std</span>
+<span class="linenr"> 2: </span><span class="org-comment-delimiter">(* </span><span class="org-comment">HTML generation library </span><span class="org-comment-delimiter">*)</span>
+<span class="linenr"> 3: </span><span class="org-tuareg-font-lock-governing">open </span><span class="org-tuareg-font-lock-module">Tyxml</span>
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span class="org-doc">(** The route handlers for our app *)</span>
+<span class="linenr"> 6: </span>
+<span class="linenr"> 7: </span><span class="org-doc">(** Defines a handler that replies to GET requests at the root endpoint *)</span>
+<span class="linenr"> 8: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">root</span> <span class="org-tuareg-font-lock-operator">=</span> get <span class="org-string">"/"</span>
+<span class="linenr"> 9: </span>    <span class="org-tuareg-font-lock-governing">begin</span> <span class="org-keyword">fun</span> <span class="org-variable-name">_req</span> <span class="org-tuareg-font-lock-operator">-&gt;</span>
+<span class="linenr">10: </span>      respond' <span class="org-tuareg-font-lock-operator">@@</span>
+<span class="linenr">11: </span>      <span class="org-tuareg-font-lock-module">Content.</span>welcome_page
+<span class="linenr">12: </span>    <span class="org-tuareg-font-lock-governing">end</span>
+<span class="linenr">13: </span>
+<span class="linenr">14: </span><span class="org-doc">(** Defines a handler that takes a path parameter from the route *)</span>
+<span class="linenr">15: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">hello</span> <span class="org-tuareg-font-lock-operator">=</span> get <span class="org-string">"/hello/:lang"</span>
+<span class="linenr">16: </span>    <span class="org-tuareg-font-lock-governing">begin</span> <span class="org-keyword">fun</span> <span class="org-variable-name">req</span> <span class="org-tuareg-font-lock-operator">-&gt;</span>
+<span class="linenr">17: </span>      <span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">lang</span> <span class="org-tuareg-font-lock-operator">=</span> param req <span class="org-string">"lang"</span> <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr">18: </span>      respond' <span class="org-tuareg-font-lock-operator">@@</span>
+<span class="linenr">19: </span>      <span class="org-tuareg-font-lock-module">Content.</span>hello_page lang
+<span class="linenr">20: </span>    <span class="org-tuareg-font-lock-governing">end</span>
+<span class="linenr">21: </span>
+<span class="linenr">22: </span><span class="org-doc">(** Fallback handler in case the endpoint is called without a language parameter *)</span>
+<span class="linenr">23: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">hello_fallback</span> <span class="org-tuareg-font-lock-operator">=</span> get <span class="org-string">"/hello"</span>
+<span class="linenr">24: </span>    <span class="org-tuareg-font-lock-governing">begin</span> <span class="org-keyword">fun</span> <span class="org-variable-name">_req</span> <span class="org-tuareg-font-lock-operator">-&gt;</span>
+<span class="linenr">25: </span>      respond' <span class="org-tuareg-font-lock-operator">@@</span>
+<span class="linenr">26: </span>      <span class="org-tuareg-font-lock-module">Content.</span>basic_page <span class="org-tuareg-font-lock-module">Html.</span><span class="org-tuareg-font-lock-operator">[</span>p <span class="org-tuareg-font-lock-operator">[</span>txt <span class="org-string">"Hiya"</span><span class="org-tuareg-font-lock-operator">]]</span>
+<span class="linenr">27: </span>    <span class="org-tuareg-font-lock-governing">end</span>
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgbd14dff" class="outline-4">
+<h4 id="orgbd14dff"><span class="section-number-4">4.2.1</span> Explanation of the code</h4>
+<div class="outline-text-4" id="text-4-2-1">
+</div>
+<ol class="org-ol">
+<li><a id="org58ab7e3"></a>Responding to requests<br />
+<div class="outline-text-5" id="text-4-2-1-1">
+<p>
+Each function is defined in terms of a <a href="https://rgrinberg.github.io/opium/opium/Opium/App/index.html#type-route">route combinator</a> that takes a string
+encoding the route and a handler function. The handler function takes an
+incoming request (<code>req</code>) to an outgoing response.
+</p>
+
+<p>
+The <code>root</code> and <code>hello_fallback</code> handlers don&rsquo;t use the request. Instead, they
+use <a href="https://rgrinberg.github.io/opium/opium/Opium/App/index.html#val-respond'">respond&rsquo;</a> to reply with the relevant page defined in the <a href="#orga7b12b9"><code>Content</code> module</a>.
+The <code>'</code> on the <code>respond'</code> function indicates that the respone is a deferred
+<code>Lwt.t</code> value. We&rsquo;ll use this for all our respones, and <code>Lwt</code> will handle all
+the concurrency for us.
+</p>
+
+<p>
+Note that the <code>hello_fallback</code> handler offers the first appearance of
+HTML generation: <code>Html.[p [txt "Hiya"]]</code> invokes the <code>p</code> and <code>txt</code> functions
+from the <code>Tyxml</code>&rsquo;s <code>Html</code> module to generate a paragraph HTML element holding
+the text <code>"Hiya"</code>. We will explore this deeper in the section on <a href="#org023084e">Content
+Generation</a>.
+</p>
+</div>
+</li>
+
+<li><a id="org546c3d8"></a>Handling path parameters<br />
+<div class="outline-text-5" id="text-4-2-1-2">
+<p>
+The <code>hello</code> function handles routes that include a segment after the <code>"hello"</code>.
+The <code>:lang</code> component of the path will cause a <code>"lang"</code> parameter to be added to
+the <code>req</code>. This parameter will hold a string recording the value of this segment
+of the path for any incoming request that matches the pattern. <code>"/hello/Hindi"</code>
+matches this pattern but <code>"/hello/foo/bar"</code> and <code>"/hello"</code> do not.
+</p>
+
+<p>
+Here, we just pass the lang parameter on to our page generation function
+<code>Content.hello_page</code>.
+</p>
+</div>
+</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org3246afc" class="outline-3">
+<h3 id="org3246afc"><span class="section-number-3">4.3</span> Content Generation <a id="org023084e"></a></h3>
+<div class="outline-text-3" id="text-4-3">
+<p>
+All of the route handlers call functions from the <code>Content</code> module. This is
+where we&rsquo;ve collected all the functions responsible for generating HTML. I&rsquo;ll
+walk through some highlights of the code, but see the <a href="https://ocsigen.org/tyxml/4.3.0/api/Html_sigs.T">Tyxml documentation</a> for
+more information and instruction on how to use it&rsquo;s <code>Html</code> module (there is also
+a <a href="https://ocsigen.org/tyxml/4.3.0/manual/ppx">ppx syntax extension</a> letting you write HTML with embedded OCaml).
+</p>
+
+<p>
+There are other options for HTML templating, so if you prefer, you may want to
+check out <a href="https://github.com/rgrinberg/ocaml-mustache">ocaml-mustache</a> or <a href="http://komar.in/en/code/ecaml">ecaml</a>.
+</p>
+</div>
+
+<div id="outline-container-org622ccaa" class="outline-4">
+<h4 id="org622ccaa"><span class="section-number-4">4.3.1</span> Basics of Tyxml as Seen in the  <code>&lt;head&gt;</code> Element</h4>
+<div class="outline-text-4" id="text-4-3-1">
+<p>
+For the sake of a deeper dive into a short piece of HTML generating code,
+consider the head element we define for use in all the following content:
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 8: </span>The <code>&lt;head&gt;</code> element defined in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/content.ml">./lib/content.ml</a></label><pre class="src src-ocaml" id="org58c17c6"><span class="linenr"> 1: </span><span class="org-tuareg-font-lock-governing">open </span><span class="org-tuareg-font-lock-module">Core</span>
+<span class="linenr"> 2: </span><span class="org-tuareg-font-lock-governing">open </span><span class="org-tuareg-font-lock-module">Tyxml</span>
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span><span class="org-doc">(** A &lt;head&gt; component shared by all pages *)</span>
+<span class="linenr"> 5: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">default_head</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr"> 6: </span>  <span class="org-tuareg-font-lock-governing">let</span> <span class="org-tuareg-font-lock-governing">open </span><span class="org-tuareg-font-lock-module">Html</span> <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr"> 7: </span>  head
+<span class="linenr"> 8: </span>    <span class="org-tuareg-font-lock-operator">(</span>title <span class="org-tuareg-font-lock-operator">(</span>txt <span class="org-string">"OCaml Webapp Tutorial"</span><span class="org-tuareg-font-lock-operator">))</span>
+<span class="linenr"> 9: </span>    <span class="org-tuareg-font-lock-operator">[</span> meta <span class="org-tuareg-font-lock-label">~a</span><span class="org-tuareg-font-lock-operator">:[</span>a_charset <span class="org-string">"UTF-8"</span><span class="org-tuareg-font-lock-operator">]</span> <span class="org-tuareg-font-lock-operator">()</span>
+<span class="linenr">10: </span>    <span class="org-tuareg-font-lock-operator">;</span> link <span class="org-tuareg-font-lock-label">~rel</span><span class="org-tuareg-font-lock-operator">:[</span><span class="org-tuareg-font-lock-constructor">`Stylesheet</span><span class="org-tuareg-font-lock-operator">]</span> <span class="org-tuareg-font-lock-label">~href</span><span class="org-tuareg-font-lock-operator">:</span><span class="org-string">"/static/style.css"</span> <span class="org-tuareg-font-lock-operator">()</span> <span class="org-tuareg-font-lock-operator">]</span>
+</pre>
+</div>
+</div>
+
+<ol class="org-ol">
+<li><a id="org05edfc8"></a>Explanation of the code<br />
+<div class="outline-text-5" id="text-4-3-1-1">
+<p>
+<code>Tyxml.Html</code> aims to provide type-safe combinators for every valid HTML element.
+The name of the combinator is generally the same as the tag for the element
+itself. Most combinators take an optional named <code>~a</code> argument that accepts a
+list of attributes, and a required argument with a list of values of type
+<code>Tyxml.Html.elt</code> which specify the element&rsquo;s inner HTML.
+</p>
+
+<p>
+In the <code>default_head</code> function, we see <code>head</code>, which generates
+<code>&lt;head&gt;...&lt;/head&gt;</code> elements. It is an exception to the general pattern of
+element combinators: since every well formed head element should have a title,
+<code>head</code> takes a required <code>title</code> argument, and then the usual list of other
+elements. The <code>title</code> element itself takes a terminal <code>txt</code> expression.
+</p>
+
+<p>
+<code>meta</code> takes a <code>()</code> instead of a list of elements. This is because it is a
+terminal element. The <code>meta</code> element shows an example of setting attributes:
+<code>Txyml.Html</code> attributes combinators all begin with the <code>a_</code> prefix. In this
+case, we declare the charset attribute for our HTML documents.
+</p>
+
+<p>
+<a href="#org58c17c6">The above code</a> generates the following HTML:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-html">&lt;<span class="org-function-name">head</span>&gt;
+  &lt;<span class="org-function-name">title</span>&gt;<span class="org-underline"><span class="org-bold">OCaml Webapp Tutorial</span></span>&lt;/<span class="org-function-name">title</span>&gt;
+  &lt;<span class="org-function-name">meta</span> <span class="org-variable-name">charset</span>=<span class="org-string">"UTF-8"</span>/&gt;
+  &lt;<span class="org-function-name">link</span> <span class="org-variable-name">rel</span>=<span class="org-string">"stylesheet"</span> <span class="org-variable-name">href</span>=<span class="org-string">"/static/style.css"</span>/&gt;
+&lt;/<span class="org-function-name">head</span>&gt;
+</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+
+<div id="outline-container-org5c0555a" class="outline-4">
+<h4 id="org5c0555a"><span class="section-number-4">4.3.2</span> Generating HTML for Use by Opium <a id="orga7b12b9"></a></h4>
+<div class="outline-text-4" id="text-4-3-2">
+<p>
+<code>opium</code> has no understanding of <code>Tyxml</code>: when we reply with HTML, <code>opium</code> just
+expects the HTML to be represented as a string. Thus, we&rsquo;ll need to render
+<code>Tyxml</code>&rsquo;s well-typed HTML AST into a string before responding to requests. In
+the following code, we do that conversation in the <code>basic_page</code> function:
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 9: </span>Generating HTML for use by <code>opium</code> in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/content.ml">./lib/content.ml</a></label><pre class="src src-ocaml" id="org310f991"><span class="linenr">11: </span><span class="org-doc">(** The basic page layout, emitted as an [`Html string] which Opium can use as a</span>
+<span class="linenr">12: </span><span class="org-doc">    response *)</span>
+<span class="linenr">13: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">basic_page</span><span class="org-variable-name"> content</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">14: </span>  <span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">raw_html</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">15: </span>    <span class="org-tuareg-font-lock-governing">let</span> <span class="org-tuareg-font-lock-governing">open </span><span class="org-tuareg-font-lock-module">Html</span> <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr">16: </span>    html default_head <span class="org-tuareg-font-lock-operator">(</span>body content<span class="org-tuareg-font-lock-operator">)</span>
+<span class="linenr">17: </span>    <span class="org-tuareg-font-lock-operator">|&gt;</span> <span class="org-tuareg-font-lock-module">Format.</span>asprintf <span class="org-string">"%a"</span> <span class="org-tuareg-font-lock-operator">(</span><span class="org-tuareg-font-lock-module">Html.</span>pp <span class="org-tuareg-font-lock-operator">())</span>
+<span class="linenr">18: </span>  <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr">19: </span>  <span class="org-tuareg-font-lock-constructor">`Html</span> raw_html
+</pre>
+</div>
+</div>
+
+<ol class="org-ol">
+<li><a id="org8ff1114"></a>Explanation of the code<br />
+<div class="outline-text-5" id="text-4-3-2-1">
+<p>
+This function is responsible for the following preparation of its <code>content</code>:
+</p>
+
+<ol class="org-ol">
+<li>Wrap the <code>content</code> in a <code>&lt;body&gt;</code> tag</li>
+<li>Construct an <code>html</code> element with the <code>default_head</code></li>
+<li>Serialize the AST of type <code>_ Tyxml.Html.elt</code> into a well formatted string</li>
+<li>Wrap the <code>raw_html</code> in the <code>`Html</code> polymorphic variant tag expected by opium</li>
+</ol>
+
+<p>
+All the HTML we construct for our app will ultimately go trough <code>basic_page</code>
+prior to becoming part of an <code>opium</code> response.
+</p>
+</div>
+</li>
+</ol>
+</div>
+
+<div id="outline-container-org5e9df49" class="outline-4">
+<h4 id="org5e9df49"><span class="section-number-4">4.3.3</span> Parametric Templates</h4>
+<div class="outline-text-4" id="text-4-3-3">
+<p>
+Let&rsquo;s look at a template which takes a parameter, and see how this parameter is
+threaded through from the route handler.
+</p>
+
+<p>
+Consider the <code>hello</code> handler again
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 10: </span>The <code>hello</code> handler taking a path param <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/route.ml">./lib/route.ml</a></label><pre class="src src-ocaml" id="org6bda7ec"><span class="linenr">14: </span><span class="org-doc">(** Defines a handler that takes a path parameter from the route *)</span>
+<span class="linenr">15: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">hello</span> <span class="org-tuareg-font-lock-operator">=</span> get <span class="org-string">"/hello/:lang"</span>
+<span class="linenr">16: </span>    <span class="org-tuareg-font-lock-governing">begin</span> <span class="org-keyword">fun</span> <span class="org-variable-name">req</span> <span class="org-tuareg-font-lock-operator">-&gt;</span>
+<span class="linenr">17: </span>      <span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">lang</span> <span class="org-tuareg-font-lock-operator">=</span> param req <span class="org-string">"lang"</span> <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr">18: </span>      respond' <span class="org-tuareg-font-lock-operator">@@</span>
+<span class="linenr">19: </span>      <span class="org-tuareg-font-lock-module">Content.</span>hello_page lang
+<span class="linenr">20: </span>    <span class="org-tuareg-font-lock-governing">end</span>
+</pre>
+</div>
+
+<p>
+It retrieves the value supplied as a path parameter in the <code>:lang</code> position from
+the request, <code>req</code>, and forwards it to the <code>Content.hello_page</code> function. This
+function will then generate our HTML, which we send back as our response via
+<code>respond'</code>
+</p>
+
+<p>
+<code>Content.hello_page</code> simply pattern matches on the language supplied and generates
+a page with an appropriate greeting:
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 11: </span>The <code>hello_page</code> function taking a langauge parameter in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/content.ml">./lib/content.ml</a></label><pre class="src src-ocaml" id="org88f5d73"><span class="linenr">41: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">hello_page</span><span class="org-variable-name"> lang</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">42: </span>  <span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">greeting</span> <span class="org-tuareg-font-lock-operator">=</span> <span class="org-keyword">match</span> lang <span class="org-keyword">with</span>
+<span class="linenr">43: </span>    <span class="org-tuareg-font-lock-operator">|</span> <span class="org-string">"&#20013;&#25991;"</span>    <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-string">"&#20320;&#22909;&#65292;&#19990;&#30028;!"</span>
+<span class="linenr">44: </span>    <span class="org-tuareg-font-lock-operator">|</span> <span class="org-string">"Deutsch"</span> <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-string">"Hallo, Welt!"</span>
+<span class="linenr">45: </span>    <span class="org-tuareg-font-lock-operator">|</span> <span class="org-string">"English"</span> <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-string">"Hello, World!"</span>
+<span class="linenr">46: </span>    <span class="org-tuareg-font-lock-operator">|</span> _         <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-string">"Language not supported :(\nYou can add a language via PR to https://gitlab.com/shonfeder/ocaml_webapp"</span>
+<span class="linenr">47: </span>  <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr">48: </span>  basic_page <span class="org-tuareg-font-lock-module">Html.</span><span class="org-tuareg-font-lock-operator">[</span>p <span class="org-tuareg-font-lock-operator">[</span>txt greeting<span class="org-tuareg-font-lock-operator">]]</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0e10931" class="outline-4">
+<h4 id="org0e10931"><span class="section-number-4">4.3.4</span> Forms that Submit Post Requests</h4>
+<div class="outline-text-4" id="text-4-3-4">
+<p>
+Finally, let&rsquo;s see how we can generate a form that will submit a post request.
+</p>
+
+<p>
+The <code>add_excerpt_page</code> generates a page serving a simple form that collects
+information describing an excerpt from a book, article, or other source:
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 12: </span>The <code>add_excerpt_page</code> function generating a form in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/content.ml">./lib/content.ml</a></label><pre class="src src-ocaml" id="orgaf2925b"><span class="linenr">50: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">add_excerpt_page</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">51: </span>  <span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">txt_input</span><span class="org-variable-name"> name</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">52: </span>    <span class="org-tuareg-font-lock-module">Html.</span><span class="org-tuareg-font-lock-operator">[</span> label <span class="org-tuareg-font-lock-label">~a</span><span class="org-tuareg-font-lock-operator">:[</span>a_label_for name<span class="org-tuareg-font-lock-operator">]</span> <span class="org-tuareg-font-lock-operator">[</span>txt <span class="org-tuareg-font-lock-operator">(</span><span class="org-tuareg-font-lock-module">String.</span>capitalize name<span class="org-tuareg-font-lock-operator">)]</span>
+<span class="linenr">53: </span>         <span class="org-tuareg-font-lock-operator">;</span> input <span class="org-tuareg-font-lock-label">~a</span><span class="org-tuareg-font-lock-operator">:[</span>a_input_type <span class="org-tuareg-font-lock-constructor">`Text</span><span class="org-tuareg-font-lock-operator">;</span> a_name name<span class="org-tuareg-font-lock-operator">]</span> <span class="org-tuareg-font-lock-operator">()</span> <span class="org-tuareg-font-lock-operator">]</span>
+<span class="linenr">54: </span>  <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr">55: </span>  <span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">excerpt_input</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">56: </span>    <span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">name</span> <span class="org-tuareg-font-lock-operator">=</span> <span class="org-string">"excerpt"</span> <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr">57: </span>    <span class="org-tuareg-font-lock-module">Html.</span><span class="org-tuareg-font-lock-operator">[</span> label <span class="org-tuareg-font-lock-label">~a</span><span class="org-tuareg-font-lock-operator">:[</span>a_label_for name<span class="org-tuareg-font-lock-operator">]</span> <span class="org-tuareg-font-lock-operator">[</span>txt <span class="org-tuareg-font-lock-operator">(</span><span class="org-tuareg-font-lock-module">String.</span>capitalize name<span class="org-tuareg-font-lock-operator">)]</span>
+<span class="linenr">58: </span>         <span class="org-tuareg-font-lock-operator">;</span> textarea <span class="org-tuareg-font-lock-label">~a</span><span class="org-tuareg-font-lock-operator">:[</span>a_name name<span class="org-tuareg-font-lock-operator">]</span> <span class="org-tuareg-font-lock-operator">(</span>txt <span class="org-string">""</span><span class="org-tuareg-font-lock-operator">)</span> <span class="org-tuareg-font-lock-operator">]</span>
+<span class="linenr">59: </span>  <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr">60: </span>  <span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">submit</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">61: </span>    <span class="org-tuareg-font-lock-module">Html.</span><span class="org-tuareg-font-lock-operator">[</span>input <span class="org-tuareg-font-lock-label">~a</span><span class="org-tuareg-font-lock-operator">:[</span> a_input_type <span class="org-tuareg-font-lock-constructor">`Submit</span><span class="org-tuareg-font-lock-operator">;</span> a_value <span class="org-string">"Submit"</span><span class="org-tuareg-font-lock-operator">]</span> <span class="org-tuareg-font-lock-operator">()</span> <span class="org-tuareg-font-lock-operator">]</span>
+<span class="linenr">62: </span>  <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr">63: </span>  basic_page
+<span class="linenr">64: </span>    <span class="org-tuareg-font-lock-module">Html.</span><span class="org-tuareg-font-lock-operator">[</span> form <span class="org-tuareg-font-lock-label">~a</span><span class="org-tuareg-font-lock-operator">:[</span>a_method <span class="org-tuareg-font-lock-constructor">`Post</span><span class="org-tuareg-font-lock-operator">;</span> a_action <span class="org-string">"/excerpts/add"</span><span class="org-tuareg-font-lock-operator">]</span>
+<span class="linenr">65: </span>             <span class="org-tuareg-font-lock-operator">(</span><span class="org-tuareg-font-lock-module">List.</span>map <span class="org-tuareg-font-lock-label">~f</span><span class="org-tuareg-font-lock-operator">:</span>p
+<span class="linenr">66: </span>                <span class="org-tuareg-font-lock-operator">[</span> txt_input <span class="org-string">"author"</span>
+<span class="linenr">67: </span>                <span class="org-tuareg-font-lock-operator">;</span> excerpt_input
+<span class="linenr">68: </span>                <span class="org-tuareg-font-lock-operator">;</span> txt_input <span class="org-string">"source"</span>
+<span class="linenr">69: </span>                <span class="org-tuareg-font-lock-operator">;</span> txt_input <span class="org-string">"page"</span>
+<span class="linenr">70: </span>                <span class="org-tuareg-font-lock-operator">;</span> submit
+<span class="linenr">71: </span>                <span class="org-tuareg-font-lock-operator">])]</span>
+</pre>
+</div>
+
+<p>
+Lines 51 through 62 define self-documenting helpers that we use to build up the
+parts of the form. We construct the page with the form using the named attribute
+argument <code>a</code> to configure the form to send a <code>`Post</code> request to our
+<code>/excerpts/add</code> endpoint.
+</p>
+
+<p>
+We serve the <code>add_excerpt_page</code> in response to GET requests to <code>/excerpts/add</code>:
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 13: </span>The <code>get_excerpts_add</code> handler serving our form in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/route.ml">./lib/route.ml</a></label><pre class="src src-ocaml" id="orgf062e7c"><span class="linenr">29: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">get_excerpts_add</span> <span class="org-tuareg-font-lock-operator">=</span> get <span class="org-string">"/excerpts/add"</span> <span class="org-tuareg-font-lock-governing">begin</span> <span class="org-keyword">fun</span> <span class="org-variable-name">_req</span> <span class="org-tuareg-font-lock-operator">-&gt;</span>
+<span class="linenr">30: </span>    respond' <span class="org-tuareg-font-lock-operator">@@</span>
+<span class="linenr">31: </span>    <span class="org-tuareg-font-lock-module">Content.</span>add_excerpt_page
+<span class="linenr">32: </span>  <span class="org-tuareg-font-lock-governing">end</span>
+</pre>
+</div>
+
+<p>
+But we respond to POST requests at <code>/excerpts/add</code> via a different handler.
+Examining this handler will lead us into our interactions with the database, so
+before discussing <a href="#orgbc00962">how to use the <code>Db</code> api in a post route</a>, we&rsquo;ll walk through
+the database code.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd923349" class="outline-3">
+<h3 id="orgd923349"><span class="section-number-3">4.4</span> Interfacing with the Database <a id="org515d6f0"></a></h3>
+<div class="outline-text-3" id="text-4-4">
+<p>
+The database interface is entirely encapsulated within the
+<a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/db.ml">./lib/db.ml</a> module. Let&rsquo;s review the API defined in
+<a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/db.mli">./lib/db.mli</a>:
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 14: </span>The API for the <code>Db</code> module in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/db.mli">./lib/db.mli</a></label><pre class="src src-ocaml" id="orgeb48dd4"><span class="linenr"> 1: </span><span class="org-tuareg-font-lock-governing">open </span><span class="org-tuareg-font-lock-module">Opium.Std</span>
+<span class="linenr"> 2: </span>
+<span class="linenr"> 3: </span><span class="org-doc">(** {{1} Type aliases for clearer documentation and explication} *)</span>
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span class="org-tuareg-font-lock-governing">type</span> <span class="org-type">'err caqti_conn_pool</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr"> 6: </span>  <span class="org-tuareg-font-lock-operator">(</span><span class="org-tuareg-font-lock-module">Caqti_lwt.</span>connection<span class="org-tuareg-font-lock-operator">,</span> <span class="org-tuareg-font-lock-operator">[&gt;</span> <span class="org-tuareg-font-lock-module">Caqti_error.</span>connect<span class="org-tuareg-font-lock-operator">]</span> <span class="org-keyword">as</span> 'err<span class="org-tuareg-font-lock-operator">)</span> <span class="org-tuareg-font-lock-module">Caqti_lwt.Pool.</span>t
+<span class="linenr"> 7: </span>
+<span class="linenr"> 8: </span><span class="org-tuareg-font-lock-governing">type</span> <span class="org-tuareg-font-lock-operator">(</span><span class="org-type">'res</span><span class="org-tuareg-font-lock-operator">,</span><span class="org-type"> 'err</span><span class="org-tuareg-font-lock-operator">)</span><span class="org-type"> query</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr"> 9: </span>  <span class="org-tuareg-font-lock-module">Caqti_lwt.</span>connection <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-operator">(</span>'res<span class="org-tuareg-font-lock-operator">,</span> <span class="org-tuareg-font-lock-operator">[&lt;</span> <span class="org-tuareg-font-lock-module">Caqti_error.</span>t <span class="org-tuareg-font-lock-operator">]</span> <span class="org-keyword">as</span> 'err<span class="org-tuareg-font-lock-operator">)</span> result <span class="org-tuareg-font-lock-module">Lwt.</span>t
+<span class="linenr">10: </span>
+<span class="linenr">11: </span><span class="org-doc">(** {{1} API for the Opium app database middleware }*)</span>
+<span class="linenr">12: </span>
+<span class="linenr">13: </span><span class="org-tuareg-font-lock-governing">val</span> <span class="org-function-name">middleware</span> <span class="org-tuareg-font-lock-operator">:</span> <span class="org-tuareg-font-lock-module">App.</span>builder
+<span class="linenr">14: </span><span class="org-doc">(** [middleware app] equips the [app] with the database pool needed by the</span>
+<span class="linenr">15: </span><span class="org-doc">    functions in [Update] and [Get]. It cannot (and should not) be accessed</span>
+<span class="linenr">16: </span><span class="org-doc">    except through the API in this module. *)</span>
+<span class="linenr">17: </span>
+<span class="linenr">18: </span><span class="org-tuareg-font-lock-governing">module</span> <span class="org-tuareg-font-lock-module">Get</span> <span class="org-tuareg-font-lock-operator">:</span> <span class="org-tuareg-font-lock-governing">sig</span>
+<span class="linenr">19: </span>  <span class="org-doc">(** Execute queries that fetch from the database *)</span>
+<span class="linenr">20: </span>
+<span class="linenr">21: </span>  <span class="org-tuareg-font-lock-governing">val</span> <span class="org-function-name">excerpts_by_author</span> <span class="org-tuareg-font-lock-operator">:</span> string <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-module">Request.</span>t <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-operator">(</span><span class="org-tuareg-font-lock-module">Excerpt.</span>t list<span class="org-tuareg-font-lock-operator">,</span> string<span class="org-tuareg-font-lock-operator">)</span> <span class="org-tuareg-font-lock-module">Lwt_result.</span>t
+<span class="linenr">22: </span>  <span class="org-doc">(** [excerpts_by_author author req] is the [Ok excerpts] list of all the</span>
+<span class="linenr">23: </span><span class="org-doc">      [excerpts] by the [author], if it succeeds. *)</span>
+<span class="linenr">24: </span>
+<span class="linenr">25: </span>  <span class="org-tuareg-font-lock-governing">val</span> <span class="org-function-name">authors</span> <span class="org-tuareg-font-lock-operator">:</span> <span class="org-tuareg-font-lock-module">Request.</span>t <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-operator">(</span>string list<span class="org-tuareg-font-lock-operator">,</span> string<span class="org-tuareg-font-lock-operator">)</span> <span class="org-tuareg-font-lock-module">Lwt_result.</span>t
+<span class="linenr">26: </span>  <span class="org-doc">(** [authors req] is the [Ok authors] list of all the [authors] in the</span>
+<span class="linenr">27: </span><span class="org-doc">      database, if it succeeds. *)</span>
+<span class="linenr">28: </span>
+<span class="linenr">29: </span><span class="org-tuareg-font-lock-governing">end</span>
+<span class="linenr">30: </span>
+<span class="linenr">31: </span><span class="org-tuareg-font-lock-governing">module</span> <span class="org-tuareg-font-lock-module">Update</span> <span class="org-tuareg-font-lock-operator">:</span> <span class="org-tuareg-font-lock-governing">sig</span>
+<span class="linenr">32: </span>  <span class="org-doc">(** Execute queries that update the database *)</span>
+<span class="linenr">33: </span>
+<span class="linenr">34: </span>  <span class="org-tuareg-font-lock-governing">val</span> <span class="org-function-name">add_excerpt</span> <span class="org-tuareg-font-lock-operator">:</span> <span class="org-tuareg-font-lock-module">Excerpt.</span>t <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-module">Request.</span>t <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-operator">(</span>unit<span class="org-tuareg-font-lock-operator">,</span> string<span class="org-tuareg-font-lock-operator">)</span> <span class="org-tuareg-font-lock-module">Lwt_result.</span>t
+<span class="linenr">35: </span>  <span class="org-doc">(** [add_excerpt excerpt req] is [Ok ()] if the new excerpt can be inserted</span>
+<span class="linenr">36: </span><span class="org-doc">      into the database. *)</span>
+<span class="linenr">37: </span>
+<span class="linenr">38: </span><span class="org-tuareg-font-lock-governing">end</span>
+<span class="linenr">39: </span>
+<span class="linenr">40: </span><span class="org-doc">(** {{1} API for database migrations } *)</span>
+<span class="linenr">41: </span>
+<span class="linenr">42: </span><span class="org-tuareg-font-lock-governing">module</span> <span class="org-tuareg-font-lock-module">Migration</span> <span class="org-tuareg-font-lock-operator">:</span> <span class="org-tuareg-font-lock-governing">sig</span>
+<span class="linenr">43: </span>  <span class="org-doc">(** Interface for executing database migrations *)</span>
+<span class="linenr">44: </span>
+<span class="linenr">45: </span>  <span class="org-tuareg-font-lock-governing">type</span> <span class="org-type">'a migration_error</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">46: </span>    <span class="org-tuareg-font-lock-operator">[&lt;</span> <span class="org-tuareg-font-lock-module">Caqti_error.</span>t <span class="org-tuareg-font-lock-operator">&gt;</span> <span class="org-tuareg-font-lock-constructor">`Connect_failed</span> <span class="org-tuareg-font-lock-constructor">`Connect_rejected</span> <span class="org-tuareg-font-lock-constructor">`Post_connect</span> <span class="org-tuareg-font-lock-operator">]</span> <span class="org-keyword">as</span> 'a
+<span class="linenr">47: </span>
+<span class="linenr">48: </span>  <span class="org-tuareg-font-lock-governing">type</span> <span class="org-type">'a migration_operation</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">49: </span>    unit <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-module">Caqti_lwt.</span>connection <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-operator">(</span>unit<span class="org-tuareg-font-lock-operator">,</span> 'a migration_error<span class="org-tuareg-font-lock-operator">)</span> result <span class="org-tuareg-font-lock-module">Lwt.</span>t
+<span class="linenr">50: </span>
+<span class="linenr">51: </span>  <span class="org-tuareg-font-lock-governing">type</span> <span class="org-type">'a migration_step</span> <span class="org-tuareg-font-lock-operator">=</span> string <span class="org-tuareg-font-lock-operator">*</span> 'a migration_operation
+<span class="linenr">52: </span>
+<span class="linenr">53: </span>  <span class="org-tuareg-font-lock-governing">val</span> <span class="org-function-name">execute</span> <span class="org-tuareg-font-lock-operator">:</span> _ migration_step list <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-operator">(</span>unit<span class="org-tuareg-font-lock-operator">,</span> string<span class="org-tuareg-font-lock-operator">)</span> result <span class="org-tuareg-font-lock-module">Lwt.</span>t
+<span class="linenr">54: </span>  <span class="org-doc">(** [execute steps] is [Ok ()] if all the migration tasks in [steps] can be</span>
+<span class="linenr">55: </span><span class="org-doc">      executed or [Error err] where [err] explains the reason for failure. *)</span>
+<span class="linenr">56: </span>
+<span class="linenr">57: </span><span class="org-tuareg-font-lock-governing">end</span>
+</pre>
+</div>
+
+<p>
+This API encapsulates all the database operations so that no code in the rest of
+the app can read from or write to the database.
+</p>
+
+<p>
+Now let&rsquo;s walk through the implementation.
+</p>
+</div>
+
+<div id="outline-container-org694bf3e" class="outline-4">
+<h4 id="org694bf3e"><span class="section-number-4">4.4.1</span> Implementing the Database Connection</h4>
+<div class="outline-text-4" id="text-4-4-1">
+<p>
+To implement the database connection, we only need to construct the connection
+URI and feed it to Caqti. We use <code>Caqti_lwt</code> to create a pool of threads that can
+access this connection:
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 15: </span>Implementation of the database connection in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/db.ml">./lib/db.ml</a></label><pre class="src src-ocaml" id="orga20ccce"><span class="linenr">11: </span><span class="org-doc">(** Configuration of the connection *)</span>
+<span class="linenr">12: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">url</span> <span class="org-tuareg-font-lock-operator">=</span> <span class="org-string">"localhost"</span>
+<span class="linenr">13: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">port</span> <span class="org-tuareg-font-lock-operator">=</span> <span class="org-highlight-numbers-number">5432</span>
+<span class="linenr">14: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">database</span> <span class="org-tuareg-font-lock-operator">=</span> <span class="org-string">"ocaml_webapp"</span>
+<span class="linenr">15: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">connection_uri</span> <span class="org-tuareg-font-lock-operator">=</span> <span class="org-tuareg-font-lock-module">Printf.</span>sprintf <span class="org-string">"postgresql://%s:%i/%s"</span> url port database
+<span class="linenr">16: </span>
+<span class="linenr">17: </span><span class="org-comment-delimiter">(* </span><span class="org-comment">[connection ()] establishes a live database connection and is a pool of</span>
+<span class="linenr">18: </span><span class="org-comment">   concurrent threads for accessing that connection. </span><span class="org-comment-delimiter">*)</span>
+<span class="linenr">19: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">connect</span><span class="org-variable-name"> </span><span class="org-tuareg-font-lock-operator">()</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">20: </span>  connection_uri
+<span class="linenr">21: </span>  <span class="org-tuareg-font-lock-operator">|&gt;</span> <span class="org-tuareg-font-lock-module">Uri.</span>of_string
+<span class="linenr">22: </span>  <span class="org-tuareg-font-lock-operator">|&gt;</span> <span class="org-tuareg-font-lock-module">Caqti_lwt.</span>connect_pool <span class="org-tuareg-font-lock-label">~max_size</span><span class="org-tuareg-font-lock-operator">:</span><span class="org-highlight-numbers-number">10</span>
+<span class="linenr">23: </span>  <span class="org-tuareg-font-lock-operator">|&gt;</span> <span class="org-keyword">function</span> <span class="org-tuareg-font-lock-operator">|</span> <span class="org-tuareg-font-lock-constructor">Ok</span> pool   <span class="org-tuareg-font-lock-operator">-&gt;</span> pool
+<span class="linenr">24: </span>              <span class="org-tuareg-font-lock-operator">|</span> <span class="org-tuareg-font-lock-constructor">Error</span> err <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-builtin">failwith</span> <span class="org-tuareg-font-lock-operator">(</span><span class="org-tuareg-font-lock-module">Caqti_error.</span>show err<span class="org-tuareg-font-lock-operator">)</span>
+<span class="linenr">25: </span>
+<span class="linenr">26: </span><span class="org-comment-delimiter">(* </span><span class="org-comment">[query_pool query pool] is the [Ok res] of the [res] obtained by executing</span>
+<span class="linenr">27: </span><span class="org-comment">   the database [query], or else the [Error err] reporting the error causing</span>
+<span class="linenr">28: </span><span class="org-comment">   the query to fail. </span><span class="org-comment-delimiter">*)</span>
+<span class="linenr">29: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">query_pool</span><span class="org-variable-name"> query pool</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">30: </span>  <span class="org-tuareg-font-lock-module">Caqti_lwt.Pool.</span>use query pool
+</pre>
+</div>
+</div>
+
+<ol class="org-ol">
+<li><a id="org6a0f5e1"></a>Explanation of the code<br />
+<div class="outline-text-5" id="text-4-4-1-1">
+<p>
+The purpose of the <code>connect</code> function is largely to seal in the gnarly,
+polymorphic variant error type used by Caqti, so that the rest of the app
+doesn&rsquo;t need to be aware of it. We map the error type to a string representation
+of it, but a productionized app you&rsquo;d likely want to create a more robust error
+handler. In a production app, we&rsquo;d want more robust error handling than just
+throwing <code>failwith</code> (probably using a <code>result</code> type). The same goes for the err
+handling in the <code>query_pool</code> helper:
+</p>
+
+<p>
+<b>NOTE</b>: The configuration variables hard code our database connection parameters
+into the source, which is expedient for this tutorial, but not a good practice
+for a real project, where we&rsquo;d want to take these out of a configuration file or
+environment variable.
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-orgeb2bccf" class="outline-4">
+<h4 id="orgeb2bccf"><span class="section-number-4">4.4.2</span> Implementing the database middleware</h4>
+<div class="outline-text-4" id="text-4-4-2">
+<p>
+We need to make the database connection available at any route, so we can query
+and update it as needed. This is achieved by defining a piece of <a href="https://github.com/rgrinberg/opium#middleware">Opium
+middleware</a> that initiates the connection pool and adds it to the environment of
+our <code>opium</code> app:
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 16: </span>Implementation of the database middleware in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/db.ml">./lib/db.ml</a></label><pre class="src src-ocaml" id="org5f84c2b"><span class="linenr">40: </span><span class="org-comment-delimiter">(* </span><span class="org-comment">Seal the key type with a non-exported type, so the pool cannot be retrieved</span>
+<span class="linenr">41: </span><span class="org-comment">   outside of this module </span><span class="org-comment-delimiter">*)</span>
+<span class="linenr">42: </span><span class="org-tuareg-font-lock-governing">type</span> <span class="org-type">'err db_pool</span> <span class="org-tuareg-font-lock-operator">=</span> 'err caqti_conn_pool
+<span class="linenr">43: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">key</span> <span class="org-tuareg-font-lock-operator">:</span> <span class="org-type">_ db_pool </span><span class="org-tuareg-font-lock-module">Opium.Hmap.</span><span class="org-type">key </span><span class="org-tuareg-font-lock-operator">=</span> <span class="org-tuareg-font-lock-module">Opium.Hmap.Key.</span>create <span class="org-tuareg-font-lock-operator">(</span><span class="org-string">"db pool"</span> <span class="org-tuareg-font-lock-operator">,</span> <span class="org-keyword">fun</span> <span class="org-variable-name">_</span> <span class="org-tuareg-font-lock-operator">-&gt;</span> sexp_of_string <span class="org-string">"db_pool"</span><span class="org-tuareg-font-lock-operator">)</span>
+<span class="linenr">44: </span>
+<span class="linenr">45: </span><span class="org-comment-delimiter">(* </span><span class="org-comment">Initiate a connection pool and add it to the app environment </span><span class="org-comment-delimiter">*)</span>
+<span class="linenr">46: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">middleware</span><span class="org-variable-name"> app</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">47: </span>  <span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">pool</span> <span class="org-tuareg-font-lock-operator">=</span> connect <span class="org-tuareg-font-lock-operator">()</span>
+<span class="linenr">48: </span>  <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr">49: </span>  <span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">filter</span><span class="org-variable-name"> handler </span><span class="org-tuareg-font-lock-operator">(</span><span class="org-variable-name">req </span><span class="org-tuareg-font-lock-operator">:</span><span class="org-type"> </span><span class="org-tuareg-font-lock-module">Request.</span><span class="org-type">t</span><span class="org-tuareg-font-lock-operator">)</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">50: </span>    <span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">env</span> <span class="org-tuareg-font-lock-operator">=</span> <span class="org-tuareg-font-lock-module">Opium.Hmap.</span>add key pool <span class="org-tuareg-font-lock-operator">(</span><span class="org-tuareg-font-lock-module">Request.</span>env req<span class="org-tuareg-font-lock-operator">)</span> <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr">51: </span>    handler <span class="org-tuareg-font-lock-operator">{</span>req <span class="org-keyword">with</span> env<span class="org-tuareg-font-lock-operator">}</span>
+<span class="linenr">52: </span>  <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr">53: </span>  <span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">m</span> <span class="org-tuareg-font-lock-operator">=</span> <span class="org-tuareg-font-lock-module">Rock.Middleware.</span>create <span class="org-tuareg-font-lock-label">~name</span><span class="org-tuareg-font-lock-operator">:</span><span class="org-string">"database connection pool"</span> <span class="org-tuareg-font-lock-operator">~</span>filter <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr">54: </span>  middleware m app
+<span class="linenr">55: </span>
+<span class="linenr">56: </span><span class="org-comment-delimiter">(* </span><span class="org-comment">Execute a query on the database connection pool stored in the request</span>
+<span class="linenr">57: </span><span class="org-comment">   environment </span><span class="org-comment-delimiter">*)</span>
+<span class="linenr">58: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">query_db</span><span class="org-variable-name"> query req</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">59: </span>  <span class="org-tuareg-font-lock-module">Request.</span>env req
+<span class="linenr">60: </span>  <span class="org-tuareg-font-lock-operator">|&gt;</span> <span class="org-tuareg-font-lock-module">Opium.Hmap.</span>get key
+<span class="linenr">61: </span>  <span class="org-tuareg-font-lock-operator">|&gt;</span> query_pool query
+</pre>
+</div>
+</div>
+
+<ol class="org-ol">
+<li><a id="orga61e3ad"></a>Explanation of the code<br />
+<div class="outline-text-5" id="text-4-4-2-1">
+<p>
+The <code>key</code> is used to look up the database connection from the environment (the
+environment being a heterogeneous valued hashmap implemented using <a href="https://github.com/dbuenzli/hmap">Hmap</a>). The
+<code>db_pool</code> type alias is kept private, and we do not export the key itself, so
+there is no way to retrieve the connection from the environment outside of the
+<code>Db</code> module.
+</p>
+
+<p>
+A piece of middleware is of type <code>Opium.App.builder</code>, i.e., <code>Opium.App.t -&gt;
+Optium.App.t</code>. All of the <code>Db</code> <code>middleware</code> logic is in its inline <code>filter</code>
+function. In general, such filters take a <code>handler</code> and a request, <code>req</code>, do
+some stuff to construct a new request, and then handle the new request with the
+given <code>handler</code>. In this case, all we&rsquo;re doing is making sure that the database
+connection <code>pool</code> is available in the environment of the request. We use
+<code>opium</code>&rsquo;s <code>Rock.Middleware.create</code> to create our new middleware and apply it to
+the given app using <code>Opium.Std.middleware</code>.
+</p>
+
+<p>
+The <code>query_db</code> function is just a helper used to execute queries on
+the database connection stored in a request. If we wanted to let the client code
+execute arbitrary queries on the database connection, we could expose this
+function in the API. However, we choose to keep it hidden, so that the database
+can only be accessed through the API we define below in the <code>Get</code> and <code>Update</code>
+submodules.
+</p>
+</div>
+</li>
+</ol>
+</div>
+
+<div id="outline-container-org306fefc" class="outline-4">
+<h4 id="org306fefc"><span class="section-number-4">4.4.3</span> Writing Database Queries using <code>ppx_rapper</code></h4>
+<div class="outline-text-4" id="text-4-4-3">
+<p>
+This project uses <a href="https://roddymacsween.co.uk/">Roddy MacSween</a>&rsquo;s <a href="https://github.com/roddyyaga/ppx_rapper">ppx_rapper</a> for writing the SQL queries. It
+abstracts away some awkward boilerplate required by Caqti (tho writing queries
+directly in Caqti is not diffcult. See the <a href="#orgdd2d4ac">Additional Resources</a> for material
+covering this):
+</p>
+
+<p>
+<code>ppx_rapper</code> generates functions to form queries based on a simple templating
+syntax on top of PostgreSQL:
+</p>
+
+<ul class="org-ul">
+<li>Input parameters are indicated with <code>%type{param_name}</code>, which will produce a
+named argument for the function, <code>~param_name:type</code>. When the flag <code>record_in</code>
+is supplied, these parameters are taken from record fields of the same name.</li>
+<li>Outputs are indicated with <code>@type{expression}</code>, which, when the
+<code>record_out</code> flag is supplied, will return a record <code>{expression : type; ...}</code>
+including fields for all indicated values of the specified types.</li>
+</ul>
+
+<p>
+To help illustrate how this works, compare the queries below with the functions
+in the <code>Get</code> and <code>Update</code> submodules which execute the queries:
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 17: </span>Defining database queries in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/db.ml">./lib/db.ml</a></label><pre class="src src-ocaml" id="orgd9df41a"><span class="linenr"> 56: </span><span class="org-doc">(** Collects all the SQL queries *)</span>
+<span class="linenr"> 57: </span><span class="org-tuareg-font-lock-governing">module</span> <span class="org-tuareg-font-lock-module">Query</span> <span class="org-tuareg-font-lock-operator">=</span> <span class="org-tuareg-font-lock-governing">struct</span>
+<span class="linenr"> 58: </span>  <span class="org-tuareg-font-lock-governing">type</span> <span class="org-tuareg-font-lock-operator">(</span><span class="org-type">'res</span><span class="org-tuareg-font-lock-operator">,</span><span class="org-type"> 'err</span><span class="org-tuareg-font-lock-operator">)</span><span class="org-type"> query_result</span> <span class="org-tuareg-font-lock-operator">=</span> <span class="org-tuareg-font-lock-operator">(</span>'res<span class="org-tuareg-font-lock-operator">,</span> <span class="org-tuareg-font-lock-operator">[&gt;</span> <span class="org-tuareg-font-lock-module">Caqti_error.</span>call_or_retrieve <span class="org-tuareg-font-lock-operator">]</span> <span class="org-keyword">as</span> 'err<span class="org-tuareg-font-lock-operator">)</span> result <span class="org-tuareg-font-lock-module">Lwt.</span>t
+<span class="linenr"> 59: </span>
+<span class="linenr"> 60: </span>  <span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">add_excerpt</span>
+<span class="linenr"> 61: </span>    <span class="org-tuareg-font-lock-operator">:</span> <span class="org-tuareg-font-lock-module">Excerpt.</span>t <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-module">Caqti_lwt.</span>connection <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-operator">(</span>unit<span class="org-tuareg-font-lock-operator">,</span> 'err<span class="org-tuareg-font-lock-operator">)</span> query_result <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr"> 62: </span>    <span class="org-tuareg-font-lock-governing">let</span> <span class="org-tuareg-font-lock-governing">open </span><span class="org-tuareg-font-lock-module">Excerpt</span> <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr"> 63: </span>    <span class="org-tuareg-font-lock-extension-node">[%rapper</span> execute
+<span class="linenr"> 64: </span>        <span class="org-string">{sql|</span>
+<span class="linenr"> 65: </span><span class="org-string">        INSERT INTO excerpts(author, excerpt, source, page)</span>
+<span class="linenr"> 66: </span><span class="org-string">        VALUES (%string{author}, %string{excerpt}, %string{source}, %string?{page})</span>
+<span class="linenr"> 67: </span><span class="org-string">        |sql}</span>
+<span class="linenr"> 68: </span>        record_in
+<span class="linenr"> 69: </span>    <span class="org-tuareg-font-lock-extension-node">]</span>
+<span class="linenr"> 70: </span>
+<span class="linenr"> 71: </span>  <span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">get_excerpts_by_author</span>
+<span class="linenr"> 72: </span>    <span class="org-tuareg-font-lock-operator">:</span> <span class="org-tuareg-font-lock-label">author</span><span class="org-tuareg-font-lock-operator">:</span>string <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-module">Caqti_lwt.</span>connection <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-operator">(</span><span class="org-tuareg-font-lock-module">Excerpt.</span>t list<span class="org-tuareg-font-lock-operator">,</span> 'err<span class="org-tuareg-font-lock-operator">)</span> query_result <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr"> 73: </span>    <span class="org-tuareg-font-lock-governing">let</span> <span class="org-tuareg-font-lock-governing">open </span><span class="org-tuareg-font-lock-module">Excerpt</span> <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr"> 74: </span>    <span class="org-tuareg-font-lock-extension-node">[%rapper</span> get_many
+<span class="linenr"> 75: </span>        <span class="org-string">{sql|</span>
+<span class="linenr"> 76: </span><span class="org-string">        SELECT @string{author}, @string{excerpt}, @string{source}, @string?{page}</span>
+<span class="linenr"> 77: </span><span class="org-string">        FROM excerpts</span>
+<span class="linenr"> 78: </span><span class="org-string">        WHERE author = %string{author}</span>
+<span class="linenr"> 79: </span><span class="org-string">        |sql}</span>
+<span class="linenr"> 80: </span>        record_out
+<span class="linenr"> 81: </span>    <span class="org-tuareg-font-lock-extension-node">]</span>
+<span class="linenr"> 82: </span>
+<span class="linenr"> 83: </span>  <span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">get_authors</span>
+<span class="linenr"> 84: </span>    <span class="org-tuareg-font-lock-operator">:</span> unit <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-module">Caqti_lwt.</span>connection <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-operator">(</span>string list<span class="org-tuareg-font-lock-operator">,</span> 'err<span class="org-tuareg-font-lock-operator">)</span> query_result <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr"> 85: </span>    <span class="org-tuareg-font-lock-extension-node">[%rapper</span> get_many
+<span class="linenr"> 86: </span>        <span class="org-string">{sql|</span>
+<span class="linenr"> 87: </span><span class="org-string">        SELECT DISTINCT @string{author}</span>
+<span class="linenr"> 88: </span><span class="org-string">        FROM excerpts</span>
+<span class="linenr"> 89: </span><span class="org-string">        |sql}</span>
+<span class="linenr"> 90: </span>    <span class="org-tuareg-font-lock-extension-node">]</span>
+<span class="linenr"> 91: </span><span class="org-tuareg-font-lock-governing">end</span>
+<span class="linenr"> 92: </span>
+<span class="linenr"> 93: </span><span class="org-comment-delimiter">(* </span><span class="org-comment">Execute queries for fetching data </span><span class="org-comment-delimiter">*)</span>
+<span class="linenr"> 94: </span><span class="org-tuareg-font-lock-governing">module</span> <span class="org-tuareg-font-lock-module">Get</span> <span class="org-tuareg-font-lock-operator">=</span> <span class="org-tuareg-font-lock-governing">struct</span>
+<span class="linenr"> 95: </span>  <span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">excerpts_by_author</span><span class="org-variable-name"> author</span> <span class="org-tuareg-font-lock-operator">:</span> <span class="org-tuareg-font-lock-module">Request.</span><span class="org-type">t </span><span class="org-tuareg-font-lock-operator">-&gt;</span><span class="org-type"> </span><span class="org-tuareg-font-lock-operator">(</span><span class="org-tuareg-font-lock-module">Excerpt.</span><span class="org-type">t list</span><span class="org-tuareg-font-lock-operator">,</span><span class="org-type"> string</span><span class="org-tuareg-font-lock-operator">)</span><span class="org-type"> </span><span class="org-tuareg-font-lock-module">Lwt_result.</span><span class="org-type">t</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr"> 96: </span>    query_db <span class="org-tuareg-font-lock-operator">(</span><span class="org-tuareg-font-lock-module">Query.</span>get_excerpts_by_author <span class="org-tuareg-font-lock-operator">~</span>author<span class="org-tuareg-font-lock-operator">)</span>
+<span class="linenr"> 97: </span>
+<span class="linenr"> 98: </span>  <span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">authors</span> <span class="org-tuareg-font-lock-operator">:</span> <span class="org-tuareg-font-lock-module">Request.</span><span class="org-type">t </span><span class="org-tuareg-font-lock-operator">-&gt;</span><span class="org-type"> </span><span class="org-tuareg-font-lock-operator">(</span><span class="org-type">string list</span><span class="org-tuareg-font-lock-operator">,</span><span class="org-type"> string</span><span class="org-tuareg-font-lock-operator">)</span><span class="org-type"> </span><span class="org-tuareg-font-lock-module">Lwt_result.</span><span class="org-type">t </span><span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr"> 99: </span>    query_db <span class="org-tuareg-font-lock-operator">(</span><span class="org-keyword">fun</span> <span class="org-variable-name">c</span> <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-module">Query.</span>get_authors <span class="org-tuareg-font-lock-operator">()</span> c<span class="org-tuareg-font-lock-operator">)</span>
+<span class="linenr">100: </span><span class="org-tuareg-font-lock-governing">end</span>
+<span class="linenr">101: </span>
+<span class="linenr">102: </span><span class="org-comment-delimiter">(* </span><span class="org-comment">Execute queries for updating data </span><span class="org-comment-delimiter">*)</span>
+<span class="linenr">103: </span><span class="org-tuareg-font-lock-governing">module</span> <span class="org-tuareg-font-lock-module">Update</span> <span class="org-tuareg-font-lock-operator">=</span> <span class="org-tuareg-font-lock-governing">struct</span>
+<span class="linenr">104: </span>  <span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">add_excerpt</span><span class="org-variable-name"> excerpt</span> <span class="org-tuareg-font-lock-operator">:</span> <span class="org-tuareg-font-lock-module">Request.</span><span class="org-type">t </span><span class="org-tuareg-font-lock-operator">-&gt;</span><span class="org-type"> </span><span class="org-tuareg-font-lock-operator">(</span><span class="org-type">unit</span><span class="org-tuareg-font-lock-operator">,</span><span class="org-type"> string</span><span class="org-tuareg-font-lock-operator">)</span><span class="org-type"> </span><span class="org-tuareg-font-lock-module">Lwt_result.</span><span class="org-type">t</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">105: </span>    query_db <span class="org-tuareg-font-lock-operator">(</span><span class="org-keyword">fun</span> <span class="org-variable-name">c</span> <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-module">Query.</span>add_excerpt excerpt c<span class="org-tuareg-font-lock-operator">)</span>
+<span class="linenr">106: </span><span class="org-tuareg-font-lock-governing">end</span>
+</pre>
+</div>
+</div>
+
+<ol class="org-ol">
+<li><a id="orgd47af5f"></a>Explanation of the code<br />
+<div class="outline-text-5" id="text-4-4-3-1">
+<p>
+<code>Query.add_excerpt</code> will <code>execute</code> the query defined in the
+<code>sql</code> string. The function generated by <code>ppx_rapper</code> has no output values, as
+indicated by the absence of any leading <code>@</code>, so it will return a <code>unit</code>. The SQL
+template takes four input values, <code>%string{author}</code>, <code>%string{excerpt}</code>,
+<code>%string{source}</code>, and <code>string?{page}</code>. <code>%string?{page}</code> indicates that <code>page</code>
+will be of type <code>string option</code>. The use of the <code>record_in</code> dictates that these
+values will be taken from a record with the corresponding field names and types;
+i.e., a record of type <code>Excerpt.t</code>:
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 18: </span>The type for <code>Excerpt.t</code> records, defined in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/excerpt.ml">./lib/excerpt.ml</a></label><pre class="src src-ocaml" id="org59e0634"><span class="linenr">1: </span><span class="org-tuareg-font-lock-governing">type</span> <span class="org-type">t</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">2: </span>  <span class="org-tuareg-font-lock-operator">{</span> author<span class="org-tuareg-font-lock-operator">:</span> string
+<span class="linenr">3: </span>  <span class="org-tuareg-font-lock-operator">;</span> excerpt<span class="org-tuareg-font-lock-operator">:</span> string
+<span class="linenr">4: </span>  <span class="org-tuareg-font-lock-operator">;</span> source<span class="org-tuareg-font-lock-operator">:</span> string
+<span class="linenr">5: </span>  <span class="org-tuareg-font-lock-operator">;</span> page<span class="org-tuareg-font-lock-operator">:</span> string option
+<span class="linenr">6: </span>  <span class="org-tuareg-font-lock-operator">}</span>
+</pre>
+</div>
+
+<p>
+The resulting type of <code>Query.add_excerpt</code> expresses that the function takes a
+connection to the database and inserts the excerpt into it, returning an <code>Ok ()</code>
+if all goes well.
+</p>
+
+<p>
+In the query function <code>get_excerpts_by_author</code> we see a query which will
+<code>get_many</code> results. Each result will be a <code>record_out</code>, with fields and types as
+dictated by the terms prefixed with a <code>@</code>, i.e., the <code>Excerpt.t</code> record. We also
+see that the query takes one input parameter, the <code>%string{author}</code>. Since we do
+not specify that we&rsquo;re expecting a <code>record_in</code>, the resulting function will take
+a named parameter <code>~author:string</code>.
+</p>
+
+<p>
+These query functions are used in the <code>Get</code> and <code>Update</code> submodules exposed in
+the external API. Each function in the external API ends up taking a <code>Request.t</code>
+from the Opium <code>App.t</code> and returning any fetched values as an <code>Lwt.t (Ok res)</code>
+(or an error).
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org0729879" class="outline-4">
+<h4 id="org0729879"><span class="section-number-4">4.4.4</span> Using the <code>Db</code> API in a Route <a id="orgbc00962"></a></h4>
+<div class="outline-text-4" id="text-4-4-4">
+<p>
+The handler for requests to <code>post "/excerpts/add"</code> illustrates usage of the API:
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 19: </span>Using the <code>Db</code> API to handle a post request with form data in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/route.ml">./lib/route.ml</a></label><pre class="src src-ocaml" id="org38af666"><span class="linenr">34: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">respond_or_err</span><span class="org-variable-name"> resp</span> <span class="org-tuareg-font-lock-operator">=</span> <span class="org-keyword">function</span>
+<span class="linenr">35: </span>  <span class="org-tuareg-font-lock-operator">|</span> <span class="org-tuareg-font-lock-constructor">Ok</span> v      <span class="org-tuareg-font-lock-operator">-&gt;</span> respond' <span class="org-tuareg-font-lock-operator">@@</span> resp v
+<span class="linenr">36: </span>  <span class="org-tuareg-font-lock-operator">|</span> <span class="org-tuareg-font-lock-constructor">Error</span> err <span class="org-tuareg-font-lock-operator">-&gt;</span> respond' <span class="org-tuareg-font-lock-operator">@@</span> <span class="org-tuareg-font-lock-module">Content.</span>error_page err
+<span class="linenr">37: </span>
+<span class="linenr">38: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">excerpt_of_form_data</span><span class="org-variable-name"> data</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">39: </span>  <span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">find</span><span class="org-variable-name"> data key</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">40: </span>    <span class="org-tuareg-font-lock-governing">let</span> <span class="org-tuareg-font-lock-governing">open </span><span class="org-tuareg-font-lock-module">Core</span> <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr">41: </span>    <span class="org-comment-delimiter">(* </span><span class="org-bold"><span class="org-success">NOTE</span></span><span class="org-comment"> Should handle error in case of missing fields </span><span class="org-comment-delimiter">*)</span>
+<span class="linenr">42: </span>    <span class="org-tuareg-font-lock-module">List.Assoc.</span>find_exn <span class="org-tuareg-font-lock-label">~equal</span><span class="org-tuareg-font-lock-operator">:</span><span class="org-tuareg-font-lock-module">String.</span>equal data key <span class="org-tuareg-font-lock-operator">|&gt;</span> <span class="org-tuareg-font-lock-module">String.</span>concat
+<span class="linenr">43: </span>  <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr">44: </span>  <span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">author</span>  <span class="org-tuareg-font-lock-operator">=</span> find data <span class="org-string">"author"</span>
+<span class="linenr">45: </span>  <span class="org-tuareg-font-lock-governing">and</span> <span class="org-variable-name">excerpt</span> <span class="org-tuareg-font-lock-operator">=</span> find data <span class="org-string">"excerpt"</span>
+<span class="linenr">46: </span>  <span class="org-tuareg-font-lock-governing">and</span> <span class="org-variable-name">source</span>  <span class="org-tuareg-font-lock-operator">=</span> find data <span class="org-string">"source"</span>
+<span class="linenr">47: </span>  <span class="org-tuareg-font-lock-governing">and</span> <span class="org-variable-name">page</span>    <span class="org-tuareg-font-lock-operator">=</span> <span class="org-keyword">match</span> find data <span class="org-string">"page"</span> <span class="org-keyword">with</span> <span class="org-string">""</span> <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-constructor">None</span> <span class="org-tuareg-font-lock-operator">|</span> p <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-constructor">Some</span> p
+<span class="linenr">48: </span>  <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr">49: </span>  <span class="org-tuareg-font-lock-module">Lwt.</span>return <span class="org-tuareg-font-lock-module">Excerpt.</span><span class="org-tuareg-font-lock-operator">{</span>author<span class="org-tuareg-font-lock-operator">;</span> excerpt<span class="org-tuareg-font-lock-operator">;</span> source<span class="org-tuareg-font-lock-operator">;</span> page<span class="org-tuareg-font-lock-operator">}</span>
+<span class="linenr">50: </span>
+<span class="linenr">51: </span><span class="org-tuareg-font-lock-governing">let</span> <span class="org-variable-name">post_excerpts_add</span> <span class="org-tuareg-font-lock-operator">=</span> post <span class="org-string">"/excerpts/add"</span> <span class="org-tuareg-font-lock-governing">begin</span> <span class="org-keyword">fun</span> <span class="org-variable-name">req</span> <span class="org-tuareg-font-lock-operator">-&gt;</span>
+<span class="linenr">52: </span>    <span class="org-tuareg-font-lock-governing">let</span> <span class="org-tuareg-font-lock-governing">open </span><span class="org-tuareg-font-lock-module">Lwt</span> <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr">53: </span>    <span class="org-comment-delimiter">(* </span><span class="org-bold"><span class="org-success">NOTE</span></span><span class="org-comment"> Should handle possible error arising from invalid data </span><span class="org-comment-delimiter">*)</span>
+<span class="linenr">54: </span>    <span class="org-tuareg-font-lock-module">App.</span>urlencoded_pairs_of_body req  <span class="org-tuareg-font-lock-operator">&gt;&gt;=</span>
+<span class="linenr">55: </span>    excerpt_of_form_data              <span class="org-tuareg-font-lock-operator">&gt;&gt;=</span> <span class="org-keyword">fun</span> <span class="org-variable-name">excerpt</span> <span class="org-tuareg-font-lock-operator">-&gt;</span>
+<span class="linenr">56: </span>    <span class="org-tuareg-font-lock-module">Db.Update.</span>add_excerpt excerpt req <span class="org-tuareg-font-lock-operator">&gt;&gt;=</span>
+<span class="linenr">57: </span>    respond_or_err <span class="org-tuareg-font-lock-operator">(</span><span class="org-keyword">fun</span> <span class="org-tuareg-font-lock-operator">()</span> <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-module">Content.</span>excerpt_added_page excerpt<span class="org-tuareg-font-lock-operator">)</span>
+<span class="linenr">58: </span>  <span class="org-tuareg-font-lock-governing">end</span>
+</pre>
+</div>
+</div>
+
+<ol class="org-ol">
+<li><a id="org6c757de"></a>Explanation of the code<br />
+<div class="outline-text-5" id="text-4-4-4-1">
+<p>
+The <code>respond_or_err</code> helper deals with possible <code>Error err</code> values of a
+<code>result</code>, passing <code>Ok</code> values back as responses if possible, or else responding
+with an error page.
+</p>
+
+<p>
+The <code>excerpt_of_form_data</code> function takes an association list of key-value pairs
+representing form data and constructs an <code>Excerpt.t</code> record.
+</p>
+
+<p>
+Finally, the <code>post_excerpts_add</code> handler decodes a response body containing form
+data (encoded according to the <code>application/x-www-form-urlencoded</code> content type)
+into an association list, uses the previous helper to build an <code>Excerpt.t</code>, and
+then gives the <code>Excerpt.t</code> to the <code>Db.Update.add_excerpt</code> function, which
+inserts the <code>Excerpt.t</code> into the database via the connection stored in the
+environment of the <code>req</code>.
+</p>
+</div>
+</li>
+</ol>
+</div>
+
+<div id="outline-container-orga7df2fa" class="outline-4">
+<h4 id="orga7df2fa"><span class="section-number-4">4.4.5</span> Implementation of a Rudimentary Database Migration Utility</h4>
+<div class="outline-text-4" id="text-4-4-5">
+<p>
+This app includes naive, bespoke migration and rollback utilities. They are
+defined in the <code>migration</code> directory, and make use of the <code>Db.Migration</code> module:
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 20: </span>The database migration API defined in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/db.ml">./lib/db.ml</a></label><pre class="src src-ocaml" id="org1eda2f8"><span class="linenr">108: </span><span class="org-tuareg-font-lock-governing">module</span> <span class="org-tuareg-font-lock-module">Migration</span> <span class="org-tuareg-font-lock-operator">=</span> <span class="org-tuareg-font-lock-governing">struct</span>
+<span class="linenr">109: </span>  <span class="org-tuareg-font-lock-governing">type</span> <span class="org-type">'a migration_error</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">110: </span>    <span class="org-tuareg-font-lock-operator">[&lt;</span> <span class="org-tuareg-font-lock-module">Caqti_error.</span>t <span class="org-tuareg-font-lock-operator">&gt;</span> <span class="org-tuareg-font-lock-constructor">`Connect_failed</span> <span class="org-tuareg-font-lock-constructor">`Connect_rejected</span> <span class="org-tuareg-font-lock-constructor">`Post_connect</span> <span class="org-tuareg-font-lock-operator">]</span> <span class="org-keyword">as</span> 'a
+<span class="linenr">111: </span>
+<span class="linenr">112: </span>  <span class="org-tuareg-font-lock-governing">type</span> <span class="org-type">'a migration_operation</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">113: </span>    unit <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-module">Caqti_lwt.</span>connection <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-operator">(</span>unit<span class="org-tuareg-font-lock-operator">,</span> 'a migration_error<span class="org-tuareg-font-lock-operator">)</span> result <span class="org-tuareg-font-lock-module">Lwt.</span>t
+<span class="linenr">114: </span>
+<span class="linenr">115: </span>  <span class="org-tuareg-font-lock-governing">type</span> <span class="org-type">'a migration_step</span> <span class="org-tuareg-font-lock-operator">=</span> string <span class="org-tuareg-font-lock-operator">*</span> 'a migration_operation
+<span class="linenr">116: </span>
+<span class="linenr">117: </span>  <span class="org-tuareg-font-lock-governing">let</span> <span class="org-function-name">execute</span><span class="org-variable-name"> migrations</span> <span class="org-tuareg-font-lock-operator">=</span>
+<span class="linenr">118: </span>    <span class="org-tuareg-font-lock-governing">let</span> <span class="org-tuareg-font-lock-governing">open </span><span class="org-tuareg-font-lock-module">Lwt</span> <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr">119: </span>    <span class="org-tuareg-font-lock-governing">let</span> <span class="org-tuareg-font-lock-governing">rec</span> <span class="org-function-name">run</span><span class="org-variable-name"> migrations pool</span> <span class="org-tuareg-font-lock-operator">=</span> <span class="org-keyword">match</span> migrations <span class="org-keyword">with</span>
+<span class="linenr">120: </span>      <span class="org-tuareg-font-lock-operator">|</span> <span class="org-tuareg-font-lock-operator">[]</span> <span class="org-tuareg-font-lock-operator">-&gt;</span> <span class="org-tuareg-font-lock-module">Lwt_result.</span>return <span class="org-tuareg-font-lock-operator">()</span>
+<span class="linenr">121: </span>      <span class="org-tuareg-font-lock-operator">|</span> <span class="org-tuareg-font-lock-operator">(</span>name<span class="org-tuareg-font-lock-operator">,</span> migration<span class="org-tuareg-font-lock-operator">)</span> <span class="org-tuareg-font-lock-operator">::</span> migrations <span class="org-tuareg-font-lock-operator">-&gt;</span>
+<span class="linenr">122: </span>        <span class="org-tuareg-font-lock-module">Lwt_io.</span>printf <span class="org-string">"Running: %s\n"</span> name        <span class="org-tuareg-font-lock-operator">&gt;&gt;=</span> <span class="org-keyword">fun</span> <span class="org-tuareg-font-lock-operator">()</span> <span class="org-tuareg-font-lock-operator">-&gt;</span>
+<span class="linenr">123: </span>        query_pool <span class="org-tuareg-font-lock-operator">(</span><span class="org-keyword">fun</span> <span class="org-variable-name">c</span> <span class="org-tuareg-font-lock-operator">-&gt;</span> migration <span class="org-tuareg-font-lock-operator">()</span> c<span class="org-tuareg-font-lock-operator">)</span> pool <span class="org-tuareg-font-lock-operator">&gt;&gt;=</span> <span class="org-keyword">function</span>
+<span class="linenr">124: </span>        <span class="org-tuareg-font-lock-operator">|</span> <span class="org-tuareg-font-lock-constructor">Ok</span> <span class="org-tuareg-font-lock-operator">()</span> <span class="org-tuareg-font-lock-operator">-&gt;</span> run migrations pool
+<span class="linenr">125: </span>        <span class="org-tuareg-font-lock-operator">|</span> <span class="org-tuareg-font-lock-constructor">Error</span> err <span class="org-tuareg-font-lock-operator">-&gt;</span> return <span class="org-tuareg-font-lock-operator">(</span><span class="org-tuareg-font-lock-constructor">Error</span> err<span class="org-tuareg-font-lock-operator">)</span>
+<span class="linenr">126: </span>    <span class="org-tuareg-font-lock-governing">in</span>
+<span class="linenr">127: </span>    return <span class="org-tuareg-font-lock-operator">(</span>connect <span class="org-tuareg-font-lock-operator">())</span> <span class="org-tuareg-font-lock-operator">&gt;&gt;=</span> run migrations
+<span class="linenr">128: </span><span class="org-tuareg-font-lock-governing">end</span>
+</pre>
+</div>
+
+<p>
+A migration is just a pair of a <code>string</code> (the name of the migration step) and a
+<code>query</code>. The <code>execute</code> function takes a list of <code>migrations</code>, initiates a
+<code>connection</code>, and then runs each query on the pool, so long as they result in
+<code>Ok</code> values.
+</p>
+
+<p>
+See <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/migrate/migrate.ml">./migrate/migrate.ml</a> and <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/migrate/rollback.ml">./migrate/rollback.ml</a> for
+examples of this simplistic scheme. This code has no awareness of the current
+version of the database, so it will dumbly try to run all migrations: something
+to improve in a productionized app.
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orgecb0815" class="outline-2">
+<h2 id="orgecb0815"><span class="section-number-2">5</span> Conclusion</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+This tutorial has taken us from initial installation of an OCaml development
+environment, through configuration and setup of a project, to development of a
+toy webapp, complete with an interface to PostgreSQL. There is still much more
+to cover, and many more OCaml libraries to explore and demo. But hopefully this
+material provides enough footholds to help a novice Caml rider get going.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf617b3d" class="outline-2">
+<h2 id="orgf617b3d"><span class="section-number-2">6</span> Corrections, Suggestions, and Feedback <a id="org9a3637f"></a></h2>
+<div class="outline-text-2" id="text-6">
+<p>
+If you have any questions or feedback, please
+</p>
+
+<ul class="org-ul">
+<li>Fork <a href="https://gitlab.com/shonfeder/ocaml_webapp">this repo</a> and make a PR to correct or improve something</li>
+<li><a href="https://gitlab.com/shonfeder/ocaml_webapp/issues">Open an issue</a></li>
+<li>Contact me via <a href="http://shonfeder.net">my homepage</a></li>
+</ul>
+
+<p>
+Thanks in advance for any contributions!
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgdd2d4ac" class="outline-2">
+<h2 id="orgdd2d4ac"><span class="section-number-2">7</span> Additional Resources</h2>
+<div class="outline-text-2" id="text-7">
+</div>
+<div id="outline-container-org724adaf" class="outline-3">
+<h3 id="org724adaf"><span class="section-number-3">7.1</span> Documentation</h3>
+<div class="outline-text-3" id="text-7-1">
+<ul class="org-ul">
+<li><a href="https://ocsigen.org/tyxml/4.3.0/api/Html_sigs.T">Tyxml</a></li>
+<li><a href="https://github.com/rgrinberg/opium#documentation">Opium</a></li>
+<li><a href="https://github.com/paurkedal/ocaml-caqti#documentation">Caqti</a></li>
+<li><a href="https://erratique.ch/software/logs/doc/">Logs</a></li>
+<li><a href="https://github.com/roddyyaga/ppx_rapper#usage">ppx_rapper</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgad72288" class="outline-3">
+<h3 id="orgad72288"><span class="section-number-3">7.2</span> Tutorials</h3>
+<div class="outline-text-3" id="text-7-2">
+<ul class="org-ul">
+<li>Bobby Priambodo&rsquo;s tutorial <a href="https://medium.com/@bobbypriambodo/interfacing-ocaml-and-postgresql-with-caqti-a92515bdaa11">Interfacing OCaml and PostgreSQL with Caqti</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org1664d02" class="outline-3">
+<h3 id="org1664d02"><span class="section-number-3">7.3</span> Examples</h3>
+<div class="outline-text-3" id="text-7-3">
+<ul class="org-ul">
+<li><a href="https://github.com/rgrinberg/opium/tree/master/examples">The Opium examples</a></li>
+<li>Bobby Priambodo&rsquo;s <a href="https://github.com/bobbypriambodo/ocaml-todo-api-example">Opium and PostgreSQL example app</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org481a846" class="outline-3">
+<h3 id="org481a846"><span class="section-number-3">7.4</span> About this tutorial</h3>
+<div class="outline-text-3" id="text-7-4">
+<ul class="org-ul">
+<li>This tutorial is written in <a href="https://orgmode.org/">org-mode</a> and styled with <a href="https://github.com/gongzhitaao/orgcss">orgcss</a>.</li>
+</ul>
+
+<div id="list-of-listings">
+<h2>List of Listings</h2>
+<div id="text-list-of-listings">
+<ul>
+<li><a href="#org4875fb2"><span class="listing-number">Listing 1:</span> The project configuration in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/dune-project">./dune-project</a></a></li>
+<li><a href="#org669372a"><span class="listing-number">Listing 2:</span> Helper rules in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/Makefile">./Makefile</a></a></li>
+<li><a href="#org460afe1"><span class="listing-number">Listing 3:</span> Databse port configuration in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/db.ml">./lib/db.ml</a></a></li>
+<li><a href="#org703a6b9"><span class="listing-number">Listing 4:</span> The executable defined in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/bin/main.ml">./bin/main.ml</a></a></li>
+<li><span class="listing-number">Listing 5:</span> Declaration of library dependencies from the <code>logs</code> package in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/bin/dune">./bin/dune</a></li>
+<li><a href="#org4edb628"><span class="listing-number">Listing 6:</span> The function to add our routes to the app in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/route.ml/">./lib/route.ml/</a></a></li>
+<li><a href="#orgecb5868"><span class="listing-number">Listing 7:</span> Simple handlers in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/route.ml">./lib/route.ml</a></a></li>
+<li><a href="#org58c17c6"><span class="listing-number">Listing 8:</span> The <code>&lt;head&gt;</code> element defined in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/content.ml">./lib/content.ml</a></a></li>
+<li><a href="#org310f991"><span class="listing-number">Listing 9:</span> Generating HTML for use by <code>opium</code> in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/content.ml">./lib/content.ml</a></a></li>
+<li><a href="#org6bda7ec"><span class="listing-number">Listing 10:</span> The <code>hello</code> handler taking a path param <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/route.ml">./lib/route.ml</a></a></li>
+<li><a href="#org88f5d73"><span class="listing-number">Listing 11:</span> The <code>hello_page</code> function taking a langauge parameter in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/content.ml">./lib/content.ml</a></a></li>
+<li><a href="#orgaf2925b"><span class="listing-number">Listing 12:</span> The <code>add_excerpt_page</code> function generating a form in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/content.ml">./lib/content.ml</a></a></li>
+<li><a href="#orgf062e7c"><span class="listing-number">Listing 13:</span> The <code>get_excerpts_add</code> handler serving our form in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/route.ml">./lib/route.ml</a></a></li>
+<li><a href="#orgeb48dd4"><span class="listing-number">Listing 14:</span> The API for the <code>Db</code> module in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/db.mli">./lib/db.mli</a></a></li>
+<li><a href="#orga20ccce"><span class="listing-number">Listing 15:</span> Implementation of the database connection in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/db.ml">./lib/db.ml</a></a></li>
+<li><a href="#org5f84c2b"><span class="listing-number">Listing 16:</span> Implementation of the database middleware in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/db.ml">./lib/db.ml</a></a></li>
+<li><a href="#orgd9df41a"><span class="listing-number">Listing 17:</span> Defining database queries in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/db.ml">./lib/db.ml</a></a></li>
+<li><a href="#org59e0634"><span class="listing-number">Listing 18:</span> The type for <code>Excerpt.t</code> records, defined in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/excerpt.ml">./lib/excerpt.ml</a></a></li>
+<li><a href="#org38af666"><span class="listing-number">Listing 19:</span> Using the <code>Db</code> API to handle a post request with form data in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/route.ml">./lib/route.ml</a></a></li>
+<li><a href="#org1eda2f8"><span class="listing-number">Listing 20:</span> The database migration API defined in <a href="https://gitlab.com/shonfeder/ocaml_webapp/blob/master/lib/db.ml">./lib/db.ml</a></a></li>
+</ul>
+</div>
+</div>
+<p>
+<a id="orge622355"></a>
+</p>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <div class="footpara"><p class="footpara">
+I plan to add an optional sqlite backend, which should make it easier to set
+up an run.
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> <div class="footpara"><p class="footpara">
+Project configuration in OCaml is currently more involved
+than anyone would like. We&rsquo;re making steady and rapid progress on improving the
+situation, and this section should be updated to keep pace. If you read this
+tutorial and find the setup or configuration out of date, please open a PR or
+file an issue.
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3">3</a></sup> <div class="footpara"><p class="footpara">
+This probably isn&rsquo;t the ideal way to handle the
+logging configuration, but it is straightforward and suffices for the context of
+this tutorial. See <a href="https://gitlab.com/shonfeder/ocaml_webapp/merge_requests/1">https://gitlab.com/shonfeder/ocaml_webapp/merge_requests/1</a>
+for a discussion of some alternatives and the benefits and drawbacks of this
+approach.
+</p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<p class="author">Author: Shon Feder</p>
+<p class="date">Created: 2020-10-31 Sat 19:37</p>
+</div>
+</body>
+</html>

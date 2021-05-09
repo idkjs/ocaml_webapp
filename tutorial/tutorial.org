@@ -1,0 +1,788 @@
+#+TITLE: A Lightweight OCaml Webapp Tutorial
+#+AUTHOR: Shon Feder
+
+# NOTE: To publish changes, run: org-html-export-to-html
+
+#+EXPORT_FILE_NAME: ../public/index.html
+
+#+OPTIONS: toc:nil
+# Make superscript notation explicit
+#+OPTIONS: ^:{}
+
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+#+HTML_HEAD_EXTRA: <link rel="stylesheet" type="text/css" href="styles.css"/>
+
+# Generates a well-named link to the file in the souce tree on gitlab
+#+MACRO: gitlab [[https://gitlab.com/shonfeder/ocaml_webapp/blob/master/$1][./$1]]
+
+#+BEGIN_abstract
+This tutorial aims to guide readers familiar with OCaml along one course to a
+backend for a webapp. The app is lightweight in that it doesn't take much code
+to define and in that it probably shouldn't be used for any heavy, industrial
+applications.
+
+The app implements two kinds of functionality:
+
+1. An embellished echo server, responding to path parameters
+2. An interface to a rudimentary database of author excerpts
+
+The tutorial covers the following topics:
+
+- Setting up and configuring the project
+- Routing requests (including POSTed form data)
+- Generating HTML dynamically
+- Interfacing with PostgreSQL
+
+(The OCaml ecosystem also has great support for the frontend, thanks to
+=Js_of_ocaml= and =Bucklescript=, but we won't be covering that here.)
+
+Feedback, improvements, and corrections are [[feedback][most welcome]]!
+#+END_abstract
+
+#+TOC: headlines 2
+
+* Tips on Reading this Tutorial
+
+- This is a more "advanced" tutorial, covering a wide range of functionality.
+  For a very basic intro using a simple echo server, see [[https://github.com/rgrinberg/opium][the README.md in the
+  Opium repo]].
+- All file paths are given relative to the project's root directory, unless explicitly
+  noted otherwise.
+- This repository contains the complete code for the app. The tutorial consists
+  of a tour of the source code, with some notes on setup. So I encourage you to
+  clone the app and play with the code as you read.
+- For quick reference to code examples, see the [[listing][Index of Listings]]
+- Skip or skim "Explanation of the code" sections if the code is clear to you.
+- Skip to the sections that are useful to you.
+
+* Clone This Repository <<clone-the-repo>>
+
+The best way to read this tutorial is to clone the repository
+
+#+BEGIN_SRC sh
+git clone https://gitlab.com/shonfeder/ocaml_webapp
+#+END_SRC
+
+And play with the code as you read along.
+
+(If you're org-mode user, you may even prefer to just read the
+{{{gitlab(tutorial/tutorial.org)}}} file locally.)
+
+* Setup
+** Dependencies
+
+We will be using the following OCaml libraries to build the app:
+
+- [[https://github.com/rgrinberg/opium][Opium]]: A Sinatra-like web toolkit
+- [[https://github.com/paurkedal/ocaml-caqti][Caqti]]: A library for interfacing with PostgreSQL
+- [[https://github.com/roddyyaga/ppx_rapper][ppx_rapper]]: A syntax extension to ease writing sql queries for =Caqti=
+- [[https://ocsigen.org/tyxml/4.3.0/manual/intro][TyXML]]: A library for generating correct HTML
+- [[https://erratique.ch/software/logs][Logs]]: A logging library
+- [[https://github.com/ocsigen/lwt][Lwt]]: A concurency library
+- [[https://ocaml.janestreet.com/ocaml-core/latest/doc/core/index.html][Core]]: A (standard) standard library alternative
+
+There are many other excellent and powerful web libraries we won't be using. See
+[[https://ocamlverse.github.io/content/web_networking.html][the OCamlverse page on Web and Networking]] for a catalog.
+
+** Prerequisites
+
+This section is for readers who don't currently have a well configured OCaml
+setup in place. Skip to [[Configuration][Configuration]] if you're already setup with the modern
+suite of tools.
+
+*** Install and initialize =opam=
+=opam= is the OCaml package manager.
+
+To install opam, run
+
+#+BEGIN_SRC sh
+sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)
+#+END_SRC
+
+or [[https://opam.ocaml.org/doc/Install.html][choose another method.]]
+
+Initialize opam and build your main working environment with
+
+#+BEGIN_SRC sh
+opam init
+# Install any dependencies called for
+# Answer yes to the prompts to configure your shell environment
+
+opam switch 4.08.1
+# Sets the system ocaml compiler to use ocaml 4.08.1
+# Use a different version at your own discretion
+#+END_SRC
+
+*** Install dune
+
+[[https://github.com/ocaml/dune][Dune]] is the standard build system for OCaml. We'll need it to initialize our
+project below.
+
+#+BEGIN_SRC sh
+opam install dune
+#+END_SRC
+
+*** Install editor support and initialize your configurations
+
+For the basic tooling, run
+
+#+BEGIN_SRC sh
+opam install user-setup merlin ocamlformat ocp-indent
+opam user-setup install
+#+END_SRC
+
+
+**** Emacs
+
+Install the OCaml mode for emacs
+
+#+BEGIN_SRC sh
+opam install tuareg
+#+END_SRC
+
+If you aren't already an emacs user but want to give it a spin, I highly
+recommend the [[https://www.spacemacs.org/][spacemacs]] distribution for a beginner friendly approach.
+
+I use [[https://github.com/hlissner/doom-emacs][doom-emacs]], and find the IDE experience phenomenal.
+
+**** For Vim or VSCode
+
+See [[https://ocamlverse.github.io/content/editor_setup.html][recommendations on the OCamlveres]].
+
+*** Install PostgreSQL <<install-postgres>>
+This tutorial currently[fn:postgres]  uses postgres, and you'll need postgres installed to run
+the app successfully.
+
+If you don't already have postgres set up, see the [[https://www.postgresql.org/download/][installation instructions
+from postgresql.org]] and/or the docs on installing postgres for your distro or
+OS.
+
+Make sure you also have configured your user with access to create and update
+databases. The Arch wiki has a short section [[https://wiki.archlinux.org/index.php/PostgreSQL#Create_your_first_database/user][on creating your first database and
+user]].
+** Configuration
+This section is for users who aren't very familiar with configuring an OCaml
+project. Skip to [[switch-setup][Create an opam Switch]] if you're familiar with wrangling =dune=
+and =opam=.
+
+We'll walk through the configuration[fn:configuration] of the project in this
+section. However, if you cloned the repository, [[clone-the-repo][as advised]], I encourage you to
+skip to the [[switch-setup][next section]] and then refer back here later as needed, and for
+reference when you're making your own project.
+
+*** Project initialization
+
+The basic skeleton was generated with the [[https://dune.readthedocs.io/en/stable/usage.html#initializing-components][=dune init= subcommand]]:
+
+#+BEGIN_SRC sh
+dune init proj ocaml_webapp \
+    --libs core,opium,caqti,caqti-driver-postgresql,caqti-lwt,tyxml,lwt.unix \
+    --ppx ppx_rapper
+#+END_SRC
+
+This creates a new directory named =ocaml_webapp=, with the following
+subdirectories corresponding to self-contained components:
+
+- =lib=: The library component, where all the business logic should live
+- =bin=: The executable component, this will be a client of our =lib=
+- =test=: You can guess (we won't be using this in our tutorial)
+
+Each directory has it's own =dune= file configuring the component, (which
+includes a =libraries= stanza declaring the component's dependencies).
+
+*** Configuration of the package and its dependencies
+
+We use =dune= to generate the =opam= package configuration. We always want to
+configure a package for our project so that dependencies are managed via
+configuration as code throughout.
+
+The package is configured in =./dune-project=:
+
+#+NAME: dune-project
+#+CAPTION: The project configuration in {{{gitlab(dune-project)}}}
+#+INCLUDE: "../dune-project" src dune
+
+The fields that you should customize in your own app are marked with TODOs, and
+their meaning should be straightforward. See the [[https://dune.readthedocs.io/en/stable/opam.html#generating-opam-files][dune docs]] if you want more
+details on this configuration.
+
+*** The =Makefile=
+
+These =make= rules help to expedite and standardize some common development
+tasks and commands. (If you prefer to manage these manually, you can use the
+makefile as a recipe book.)
+
+#+NAME: Makefile
+#+CAPTION: Helper rules in {{{gitlab(Makefile)}}}
+#+INCLUDE: "../Makefile" src makefile
+
+** Create an opam Switch <<switch-setup>>
+
+An =opam= "switch" is a sandboxed ocaml environment.
+
+*** A fresh opam switch for the project
+
+Create a new =opam= switch for the project with:
+
+#+BEGIN_SRC sh
+# From within the project root directory
+opam switch create . 4.08.1 --deps-only
+# I recommend 4.08.1 because all basic tools are compatible with it as of 2019/12/30
+# if this should need updating, please make an issue or PR
+#+END_SRC
+
+Developing projects in their own switch helps to ensure smoother deployment and
+guards against dependency conflicts arising between unrelated projects on your
+local system.
+
+To verify that the switch has been created and that you are now working in the
+sandbox, you can run
+
+#+BEGIN_SRC sh
+opam switch
+# →/home/you/path/to/ocaml_webapp  ocaml-base-compiler.4.08.1  /home/you/path/to/ocaml_webapp
+#+END_SRC
+
+If you do not see the switch associated with your project directory indicated by
+a =→=, then something has gone wrong.
+
+*** Install dune in the switch
+
+We installed dune previously at the system level, but we'll need it in our
+project sandbox too:
+
+#+BEGIN_SRC sh
+opam install dune
+#+END_SRC
+*** Install and update the project dependencies
+
+Run
+
+#+BEGIN_SRC sh
+make deps
+# install all dependencies
+#+END_SRC
+
+(If you opted not to use the suggested =Makefile=, manually execute the =deps=
+rule defined in the [[Makefile][Makefile]])
+
+*NOTE*: This assumes you are working inside a git repository If you did not
+clone this repo, then make sure to =git init= prior to installing the deps.
+
+*** Confirm that the app skeleton can build
+
+#+BEGIN_SRC sh
+dune build
+#+END_SRC
+
+If no errors are reported, then setup is complete!
+** Create the Postgres database
+
+Assuming you have [[install-postgres][postgresql installed]], you can use the =createdb= utility to
+create a new database for the app:
+
+#+BEGIN_SRC sh
+createdb ocaml_webapp
+# Replace 'ocaml_webapp' with your app's name if you're working with custom code
+#+END_SRC
+
+Then run the database migration to create the needed tables
+
+#+BEGIN_SRC sh
+make migrate
+#+END_SRC
+
+*** Troubleshooting problems with the database port
+
+The app is configured to look for postgres at the localhost ip on its default
+port of =5432=. If you have trouble connecting, ensure that the database is
+configured to match this configuration, or update the configuration in
+{{{gitlab(lib/db.ml)}}} to match your postgres setup:
+
+#+NAME: configuration-of-db-port
+#+CAPTION: Databse port configuration in {{{gitlab(lib/db.ml)}}}
+#+INCLUDE: "../lib/db.ml" src ocaml :lines "11-15" -n 11
+
+* Tour of the Application
+** The Executable
+We'll define our app's main executable entrypoint in the aptly named
+=./bin/main.ml=:
+
+#+NAME: server-executable
+#+CAPTION: The executable defined in {{{gitlab(bin/main.ml)}}}
+#+INCLUDE: "../bin/main.ml" src ocaml -n
+
+Run the app with
+
+#+BEGIN_SRC sh
+make run
+#+END_SRC
+
+and visit http://localhost:3000/.
+
+*** Explanation of the code
+
+From the bottom up...
+
+**** Execution
+
+The first thing we do is set up logging with the =set_logger=
+function[fn:loging-configuration]. Doing this first ensures that any important
+log messages that may be generated during subsequent actions will be recorded.
+
+=App.run_command' app= generates a commandline interface for launching our
+application =app=. It returns a value of type =unit Lwt.t=, signifying the
+/deferred/ result of running the program.
+
+You can read the docs for the generated command line interface by running
+
+#+BEGIN_SRC sh
+dune exec ocaml_webapp -- --help
+#+END_SRC
+
+We pass the deferred result to =Lwt_main.run=, which kicks of the =Lwt=
+scheduler, and runs our app (see [[https://ocsigen.org/lwt/4.1.0/api/Lwt_main][the Lwt_main docs]] for more info).
+
+**** Setting the logger
+:PROPERTIES:
+:ID:       4886a1fa-2764-4ea8-8fc1-d7cb81138d96
+:END:
+
+The =set_logger= function itself merely uses the default =logs= log reporter. It
+sets the =log_level=, which we've hard coded to =Logs.Debug=. We use the =Lwt=
+binding operator to sequence our actions here, just as we do in the =run=
+function.
+
+Note that for this logging configuration to work, we rely on the library
+dependencies =logs=, =logs.fmt=, and =logs.lwt= declared in
+{{{gitlab(bin/dune)}}}:
+
+#+CAPTION: Declaration of library dependencies from the =logs= package in {{{gitlab(bin/dune)}}}
+#+INCLUDE: "../bin/dune" src dune :lines "9-12" -n 9
+
+To see the debug logging output (very useful for tracking down routing problems)
+run the app with
+
+#+BEGIN_SRC sh
+make run-debug
+#+END_SRC
+
+This will output all the incoming and outgoing HTTP requests to your terminal.
+
+*NOTE*: The =--debug= flag used in the invocation of Opium here only affects the
+/internal/ logging from the Opium library. It is the =log_level= we set that
+effects the output level from the logger.
+
+**** Building the app
+
+=let app = ...= defines our application. Applications are built up by pushing a
+base =App.empty= through a pipeline of functions of type =App.builder=.
+=App.builder= is just a synonym for functions of type =App.t -> App.t=, which
+take in an application, add something to it, and pass along the new application.
+In this case, we build the app with the follow steps:
+
+1. Set the name for the command line interface with =App.cmd_name=
+2. Add the middleware to serve static files
+3. Add the database connection to the environment with the =Db.middleware=
+   function
+4. Add all of the route handlers with =Route.add_routes=.
+
+The helper =static= just configures a piece of middleware to serve static files,
+using Opium's =Middleware.static=. It serves the contents of the
+{{{gitlab(static)}}} directory at the ="/static"= route.
+
+** Simple Route Handlers
+
+The =Route.add_routes= of [[server-executable][./bin/main.ml]] adds all of our route handlers to the
+app. This is defined in =./lib/route.ml=:
+
+#+NAME: route-adder
+#+CAPTION: The function to add our routes to the app in {{{gitlab(lib/route.ml/)}}}
+#+INCLUDE: "../lib/route.ml" src ocaml :lines "72-86" -n 72
+
+All of our routes are defined as =App.builder= functions, and listed in the
+=routes= list.
+
+Let's look at the simplest handlers, that just serve a basic page and act as an
+echo server:
+
+#+NAME: simple-handlers
+#+CAPTION: Simple handlers in {{{gitlab(lib/route.ml)}}}
+#+INCLUDE: "../lib/route.ml" src ocaml :lines "1-29" -n
+
+*** Explanation of the code
+
+**** Responding to requests
+Each function is defined in terms of a [[https://rgrinberg.github.io/opium/opium/Opium/App/index.html#type-route][route combinator]] that takes a string
+encoding the route and a handler function. The handler function takes an
+incoming request (=req=) to an outgoing response.
+
+The =root= and =hello_fallback= handlers don't use the request. Instead, they
+use [[https://rgrinberg.github.io/opium/opium/Opium/App/index.html#val-respond'][respond']] to reply with the relevant page defined in the [[content-module][=Content= module]].
+The ='= on the =respond'= function indicates that the respone is a deferred
+=Lwt.t= value. We'll use this for all our respones, and =Lwt= will handle all
+the concurrency for us.
+
+Note that the =hello_fallback= handler offers the first appearance of
+HTML generation: =Html.[p [txt "Hiya"]]= invokes the =p= and =txt= functions
+from the =Tyxml='s =Html= module to generate a paragraph HTML element holding
+the text ="Hiya"=. We will explore this deeper in the section on [[content-generation][Content
+Generation]].
+
+**** Handling path parameters
+
+The =hello= function handles routes that include a segment after the ="hello"=.
+The =:lang= component of the path will cause a ="lang"= parameter to be added to
+the =req=. This parameter will hold a string recording the value of this segment
+of the path for any incoming request that matches the pattern. ="/hello/Hindi"=
+matches this pattern but ="/hello/foo/bar"= and ="/hello"= do not.
+
+Here, we just pass the lang parameter on to our page generation function
+=Content.hello_page=.
+
+** Content Generation <<content-generation>>
+
+All of the route handlers call functions from the =Content= module. This is
+where we've collected all the functions responsible for generating HTML. I'll
+walk through some highlights of the code, but see the [[https://ocsigen.org/tyxml/4.3.0/api/Html_sigs.T][Tyxml documentation]] for
+more information and instruction on how to use it's =Html= module (there is also
+a [[https://ocsigen.org/tyxml/4.3.0/manual/ppx][ppx syntax extension]] letting you write HTML with embedded OCaml).
+
+There are other options for HTML templating, so if you prefer, you may want to
+check out [[https://github.com/rgrinberg/ocaml-mustache][ocaml-mustache]] or [[http://komar.in/en/code/ecaml][ecaml]].
+
+*** Basics of Tyxml as Seen in the  =<head>= Element
+
+For the sake of a deeper dive into a short piece of HTML generating code,
+consider the head element we define for use in all the following content:
+
+#+NAME: html-head
+#+CAPTION: The =<head>= element defined in {{{gitlab(lib/content.ml)}}}
+#+INCLUDE: "../lib/content.ml" src ocaml :lines "1-11" -n 1
+
+**** Explanation of the code
+
+=Tyxml.Html= aims to provide type-safe combinators for every valid HTML element.
+The name of the combinator is generally the same as the tag for the element
+itself. Most combinators take an optional named =~a= argument that accepts a
+list of attributes, and a required argument with a list of values of type
+=Tyxml.Html.elt= which specify the element's inner HTML.
+
+In the =default_head= function, we see =head=, which generates
+=<head>...</head>= elements. It is an exception to the general pattern of
+element combinators: since every well formed head element should have a title,
+=head= takes a required =title= argument, and then the usual list of other
+elements. The =title= element itself takes a terminal =txt= expression.
+
+=meta= takes a =()= instead of a list of elements. This is because it is a
+terminal element. The =meta= element shows an example of setting attributes:
+=Txyml.Html= attributes combinators all begin with the =a_= prefix. In this
+case, we declare the charset attribute for our HTML documents.
+
+[[html-head][The above code]] generates the following HTML:
+
+#+BEGIN_SRC html
+<head>
+  <title>OCaml Webapp Tutorial</title>
+  <meta charset="UTF-8"/>
+  <link rel="stylesheet" href="/static/style.css"/>
+</head>
+#+END_SRC
+
+*** Generating HTML for Use by Opium <<content-module>>
+
+=opium= has no understanding of =Tyxml=: when we reply with HTML, =opium= just
+expects the HTML to be represented as a string. Thus, we'll need to render
+=Tyxml='s well-typed HTML AST into a string before responding to requests. In
+the following code, we do that conversation in the =basic_page= function:
+
+#+NAME: basic-page
+#+CAPTION: Generating HTML for use by =opium= in {{{gitlab(lib/content.ml)}}}
+#+INCLUDE: "../lib/content.ml" src ocaml :lines "12-21" -n 11
+
+**** Explanation of the code
+This function is responsible for the following preparation of its =content=:
+
+1. Wrap the =content= in a =<body>= tag
+2. Construct an =html= element with the =default_head=
+3. Serialize the AST of type =_ Tyxml.Html.elt= into a well formatted string
+4. Wrap the =raw_html= in the =`Html= polymorphic variant tag expected by opium
+
+All the HTML we construct for our app will ultimately go trough =basic_page=
+prior to becoming part of an =opium= response.
+
+*** Parametric Templates
+
+Let's look at a template which takes a parameter, and see how this parameter is
+threaded through from the route handler.
+
+Consider the =hello= handler again
+
+#+NAME: hello-path-param-route
+#+CAPTION: The =hello= handler taking a path param {{{gitlab(lib/route.ml)}}}
+#+INCLUDE: "../lib/route.ml" src ocaml :lines "14-21" -n 14
+
+It retrieves the value supplied as a path parameter in the =:lang= position from
+the request, =req=, and forwards it to the =Content.hello_page= function. This
+function will then generate our HTML, which we send back as our response via
+=respond'=
+
+=Content.hello_page= simply pattern matches on the language supplied and generates
+a page with an appropriate greeting:
+
+#+NAME: hello-page
+#+CAPTION: The =hello_page= function taking a langauge parameter in {{{gitlab(lib/content.ml)}}}
+#+INCLUDE: "../lib/content.ml" src ocaml :lines "42-50" -n 41
+
+*** Forms that Submit Post Requests
+
+Finally, let's see how we can generate a form that will submit a post request.
+
+The =add_excerpt_page= generates a page serving a simple form that collects
+information describing an excerpt from a book, article, or other source:
+
+#+NAME: add_excerpt_page
+#+CAPTION: The =add_excerpt_page= function generating a form in {{{gitlab(lib/content.ml)}}}
+#+INCLUDE: "../lib/content.ml" src ocaml :lines "51-73" -n 50
+
+Lines 51 through 62 define self-documenting helpers that we use to build up the
+parts of the form. We construct the page with the form using the named attribute
+argument =a= to configure the form to send a =`Post= request to our
+=/excerpts/add= endpoint.
+
+We serve the =add_excerpt_page= in response to GET requests to =/excerpts/add=:
+
+#+NAME: get_excerpts_add-handler
+#+CAPTION: The =get_excerpts_add= handler serving our form in {{{gitlab(lib/route.ml)}}}
+#+INCLUDE: "../lib/route.ml" src ocaml :lines "29-33" -n 29
+
+But we respond to POST requests at =/excerpts/add= via a different handler.
+Examining this handler will lead us into our interactions with the database, so
+before discussing [[db-usage-in-post-route][how to use the =Db= api in a post route]], we'll walk through
+the database code.
+
+** Interfacing with the Database <<database>>
+
+The database interface is entirely encapsulated within the
+{{{gitlab(lib/db.ml)}}} module. Let's review the API defined in
+{{{gitlab(lib/db.mli)}}}:
+
+#+NAME: database-module-api
+#+CAPTION: The API for the =Db= module in {{{gitlab(lib/db.mli)}}}
+#+INCLUDE: "../lib/db.mli" src ocaml -n
+
+This API encapsulates all the database operations so that no code in the rest of
+the app can read from or write to the database.
+
+Now let's walk through the implementation.
+
+*** Implementing the Database Connection
+
+To implement the database connection, we only need to construct the connection
+URI and feed it to Caqti. We use =Caqti_lwt= to create a pool of threads that can
+access this connection:
+
+#+NAME: database-connection-implementatoin
+#+CAPTION: Implementation of the database connection in {{{gitlab(lib/db.ml)}}}
+#+INCLUDE: "../lib/db.ml" src ocaml :lines "11-31" -n 11
+
+**** Explanation of the code
+
+The purpose of the =connect= function is largely to seal in the gnarly,
+polymorphic variant error type used by Caqti, so that the rest of the app
+doesn't need to be aware of it. We map the error type to a string representation
+of it, but a productionized app you'd likely want to create a more robust error
+handler. In a production app, we'd want more robust error handling than just
+throwing =failwith= (probably using a =result= type). The same goes for the err
+handling in the =query_pool= helper:
+
+*NOTE*: The configuration variables hard code our database connection parameters
+into the source, which is expedient for this tutorial, but not a good practice
+for a real project, where we'd want to take these out of a configuration file or
+environment variable.
+*** Implementing the database middleware
+
+We need to make the database connection available at any route, so we can query
+and update it as needed. This is achieved by defining a piece of [[https://github.com/rgrinberg/opium#middleware][Opium
+middleware]] that initiates the connection pool and adds it to the environment of
+our =opium= app:
+
+#+NAME: database-middleware
+#+CAPTION: Implementation of the database middleware in {{{gitlab(lib/db.ml)}}}
+#+INCLUDE: "../lib/db.ml" src ocaml :lines "33-55" -n 40
+
+**** Explanation of the code
+
+The =key= is used to look up the database connection from the environment (the
+environment being a heterogeneous valued hashmap implemented using [[https://github.com/dbuenzli/hmap][Hmap]]). The
+=db_pool= type alias is kept private, and we do not export the key itself, so
+there is no way to retrieve the connection from the environment outside of the
+=Db= module.
+
+A piece of middleware is of type =Opium.App.builder=, i.e., =Opium.App.t ->
+Optium.App.t=. All of the =Db= =middleware= logic is in its inline =filter=
+function. In general, such filters take a =handler= and a request, =req=, do
+some stuff to construct a new request, and then handle the new request with the
+given =handler=. In this case, all we're doing is making sure that the database
+connection =pool= is available in the environment of the request. We use
+=opium='s =Rock.Middleware.create= to create our new middleware and apply it to
+the given app using =Opium.Std.middleware=.
+
+The =query_db= function is just a helper used to execute queries on
+the database connection stored in a request. If we wanted to let the client code
+execute arbitrary queries on the database connection, we could expose this
+function in the API. However, we choose to keep it hidden, so that the database
+can only be accessed through the API we define below in the =Get= and =Update=
+submodules.
+
+*** Writing Database Queries using =ppx_rapper=
+
+This project uses [[https://roddymacsween.co.uk/][Roddy MacSween]]'s [[https://github.com/roddyyaga/ppx_rapper][ppx_rapper]] for writing the SQL queries. It
+abstracts away some awkward boilerplate required by Caqti (tho writing queries
+directly in Caqti is not diffcult. See the [[Additional Resources][Additional Resources]] for material
+covering this):
+
+=ppx_rapper= generates functions to form queries based on a simple templating
+syntax on top of PostgreSQL:
+
+- Input parameters are indicated with =%type{param_name}=, which will produce a
+  named argument for the function, =~param_name:type=. When the flag =record_in=
+  is supplied, these parameters are taken from record fields of the same name.
+- Outputs are indicated with =@type{expression}=, which, when the
+  =record_out= flag is supplied, will return a record ={expression : type; ...}=
+  including fields for all indicated values of the specified types.
+
+To help illustrate how this works, compare the queries below with the functions
+in the =Get= and =Update= submodules which execute the queries:
+
+#+NAME: database-queries
+#+CAPTION: Defining database queries in {{{gitlab(lib/db.ml)}}}
+#+INCLUDE: "../lib/db.ml" src ocaml :lines "56-107" -n 56
+
+**** Explanation of the code
+=Query.add_excerpt= will =execute= the query defined in the
+=sql= string. The function generated by =ppx_rapper= has no output values, as
+indicated by the absence of any leading =@=, so it will return a =unit=. The SQL
+template takes four input values, =%string{author}=, =%string{excerpt}=,
+=%string{source}=, and =string?{page}=. =%string?{page}= indicates that =page=
+will be of type =string option=. The use of the =record_in= dictates that these
+values will be taken from a record with the corresponding field names and types;
+i.e., a record of type =Excerpt.t=:
+
+#+NAME: excerpt-record
+#+CAPTION: The type for =Excerpt.t= records, defined in {{{gitlab(lib/excerpt.ml)}}}
+#+INCLUDE: "../lib/excerpt.ml" src ocaml -n
+
+The resulting type of =Query.add_excerpt= expresses that the function takes a
+connection to the database and inserts the excerpt into it, returning an =Ok ()=
+if all goes well.
+
+In the query function =get_excerpts_by_author= we see a query which will
+=get_many= results. Each result will be a =record_out=, with fields and types as
+dictated by the terms prefixed with a =@=, i.e., the =Excerpt.t= record. We also
+see that the query takes one input parameter, the =%string{author}=. Since we do
+not specify that we're expecting a =record_in=, the resulting function will take
+a named parameter =~author:string=.
+
+These query functions are used in the =Get= and =Update= submodules exposed in
+the external API. Each function in the external API ends up taking a =Request.t=
+from the Opium =App.t= and returning any fetched values as an =Lwt.t (Ok res)=
+(or an error).
+*** Using the =Db= API in a Route <<db-usage-in-post-route>>
+
+The handler for requests to =post "/excerpts/add"= illustrates usage of the API:
+
+#+NAME: db-api-usage
+#+CAPTION: Using the =Db= API to handle a post request with form data in {{{gitlab(lib/route.ml)}}}
+#+INCLUDE: "../lib/route.ml" src ocaml :lines "34-59" -n 34
+
+**** Explanation of the code
+The =respond_or_err= helper deals with possible =Error err= values of a
+=result=, passing =Ok= values back as responses if possible, or else responding
+with an error page.
+
+The =excerpt_of_form_data= function takes an association list of key-value pairs
+representing form data and constructs an =Excerpt.t= record.
+
+Finally, the =post_excerpts_add= handler decodes a response body containing form
+data (encoded according to the =application/x-www-form-urlencoded= content type)
+into an association list, uses the previous helper to build an =Excerpt.t=, and
+then gives the =Excerpt.t= to the =Db.Update.add_excerpt= function, which
+inserts the =Excerpt.t= into the database via the connection stored in the
+environment of the =req=.
+
+*** Implementation of a Rudimentary Database Migration Utility
+
+This app includes naive, bespoke migration and rollback utilities. They are
+defined in the =migration= directory, and make use of the =Db.Migration= module:
+
+#+NAME: database-migration-api
+#+CAPTION: The database migration API defined in {{{gitlab(lib/db.ml)}}}
+#+INCLUDE: "../lib/db.ml" src ocaml :lines "108-131" -n 108
+
+A migration is just a pair of a =string= (the name of the migration step) and a
+=query=. The =execute= function takes a list of =migrations=, initiates a
+=connection=, and then runs each query on the pool, so long as they result in
+=Ok= values.
+
+See {{{gitlab(migrate/migrate.ml)}}} and {{{gitlab(migrate/rollback.ml)}}} for
+examples of this simplistic scheme. This code has no awareness of the current
+version of the database, so it will dumbly try to run all migrations: something
+to improve in a productionized app.
+* Conclusion
+This tutorial has taken us from initial installation of an OCaml development
+environment, through configuration and setup of a project, to development of a
+toy webapp, complete with an interface to PostgreSQL. There is still much more
+to cover, and many more OCaml libraries to explore and demo. But hopefully this
+material provides enough footholds to help a novice Caml rider get going.
+* Corrections, Suggestions, and Feedback <<feedback>>
+
+If you have any questions or feedback, please
+
+- Fork [[https://gitlab.com/shonfeder/ocaml_webapp][this repo]] and make a PR to correct or improve something
+- [[https://gitlab.com/shonfeder/ocaml_webapp/issues][Open an issue]]
+- Contact me via [[http://shonfeder.net][my homepage]]
+
+Thanks in advance for any contributions!
+
+* Additional Resources
+** Documentation
+- [[https://ocsigen.org/tyxml/4.3.0/api/Html_sigs.T][Tyxml]]
+- [[https://github.com/rgrinberg/opium#documentation][Opium]]
+- [[https://github.com/paurkedal/ocaml-caqti#documentation][Caqti]]
+- [[https://erratique.ch/software/logs/doc/][Logs]]
+- [[https://github.com/roddyyaga/ppx_rapper#usage][ppx_rapper]]
+** Tutorials
+- Bobby Priambodo's tutorial [[https://medium.com/@bobbypriambodo/interfacing-ocaml-and-postgresql-with-caqti-a92515bdaa11][Interfacing OCaml and PostgreSQL with Caqti]]
+** Examples
+- [[https://github.com/rgrinberg/opium/tree/master/examples][The Opium examples]]
+- Bobby Priambodo's [[https://github.com/bobbypriambodo/ocaml-todo-api-example][Opium and PostgreSQL example app]]
+** About this tutorial
+- This tutorial is written in [[https://orgmode.org/][org-mode]] and styled with [[https://github.com/gongzhitaao/orgcss][orgcss]].
+
+#+TOC: listings
+<<listing>>
+
+* Footnotes
+
+[fn:loging-configuration] This probably isn't the ideal way to handle the
+logging configuration, but it is straightforward and suffices for the context of
+this tutorial. See https://gitlab.com/shonfeder/ocaml_webapp/merge_requests/1
+for a discussion of some alternatives and the benefits and drawbacks of this
+approach.
+
+[fn:postgres] I plan to add an optional sqlite backend, which should make it easier to set
+up an run.
+
+[fn:configuration] Project configuration in OCaml is currently more involved
+than anyone would like. We're making steady and rapid progress on improving the
+situation, and this section should be updated to keep pace. If you read this
+tutorial and find the setup or configuration out of date, please open a PR or
+file an issue.
+
+[fn:logs] See the [[https://erratique.ch/software/logs/doc/Logs/index.html#setupreporter][logs docs]] for more information on setting up log reporters.
+
+[fn:param] Unfortunately, as you can see by the need to handle the possible
+=Not_found= exception, =param= uses exceptional error handling instead of
+returning an optional value. Perhaps this is something we can fix in the future
+:)

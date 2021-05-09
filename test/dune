@@ -1,0 +1,3 @@
+(test
+ (name ocaml_webapp)
+ (libraries core opium caqti caqti-driver-postgresql caqti-lwt tyxml))

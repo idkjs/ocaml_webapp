@@ -1,0 +1,23 @@
+#+TITLE: OCaml Webapp Tutorial Project Notes
+
+* Publishing the tutorial
+
+The tutorial is currently published from my machine using
+=org-html-export-to-html=.
+
+If the tutorial ends up being useful enough to deserve being maintained for a
+long time, it should eventually should be published via CI using =org-publish=.
+
+* Tasks
+** DONE Share on social-media
+:PROPERTIES:
+:ESTIMATE: 30min
+:END:
+- [X] ocaml discourse
+- [X] reddit
+- [X] twitter
+** TODO Add test to check that app can build and run
+:PROPERTIES:
+:ESTIMATE: 1hr
+:END:
+** TODO Add functorized sqlite backend, so readers can run app without any external dependencies and setup

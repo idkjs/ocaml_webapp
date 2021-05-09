@@ -1,0 +1,15 @@
+(executable
+ (public_name ocaml_webapp)
+ (name main)
+ (libraries
+   caqti
+   caqti-driver-postgresql
+   caqti-lwt
+   core
+   logs         ;; The logs library
+   logs.fmt     ;; The logs format helper
+   logs.lwt     ;; The logs concurrency helper
+   ocaml_webapp
+   opium
+   tyxml
+))
