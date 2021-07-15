@@ -38,3 +38,5 @@ And navigate to http://localhost:3000/.
 Issues and PRs, or any other feedback or updates are welcome.
 
 You can see the project notes in [[file:project.org][./project.org]] for pending todo items.
+
+See also https://github.com/jchavarri/ocaml_webapp.
